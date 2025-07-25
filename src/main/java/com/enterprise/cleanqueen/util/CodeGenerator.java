@@ -1,72 +1,83 @@
 package com.enterprise.cleanqueen.util;
 
-import org.springframework.stereotype.Component;
-
 import java.security.SecureRandom;
+import java.util.Random;
+
+import org.springframework.stereotype.Component;
 
 @Component
 public class CodeGenerator {
-
+    
     private static final String ALPHANUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static final String NUMBERS = "0123456789";
-    private static final SecureRandom random = new SecureRandom();
-
+    private static final String NUMERIC = "0123456789";
+    private static final Random random = new SecureRandom();
+    
     /**
-     * Generates a 6-character alphanumeric ID for User, Project, Review
+     * Generate a 6-character alphanumeric ID for User and Project entities
      */
     public String generateUserId() {
         return generateRandomString(6, ALPHANUMERIC);
     }
-
+    
     /**
-     * Generates a 10-character alphanumeric ID for CleaningRequest
+     * Generate a 6-character alphanumeric ID for Project entities
      */
-    public String generateCleaningRequestId() {
+    public String generateProjectId() {
+        return generateRandomString(6, ALPHANUMERIC);
+    }
+    
+    /**
+     * Generate a 10-character alphanumeric ID for CleaningRequest entities
+     */
+    public String generateRequestId() {
         return generateRandomString(10, ALPHANUMERIC);
     }
-
+    
     /**
-     * Generates an 8-character alphanumeric ID for Task
+     * Generate an 8-character alphanumeric ID for Task entities
      */
     public String generateTaskId() {
         return generateRandomString(8, ALPHANUMERIC);
     }
-
+    
     /**
-     * Generates a 6-character alphanumeric ID for Review
+     * Generate a 6-character alphanumeric ID for Review entities
      */
     public String generateReviewId() {
         return generateRandomString(6, ALPHANUMERIC);
     }
-
+    
     /**
-     * Generates a 7-character project code in XXX-XXX format
+     * Generate a 7-character project code in XXX-XXX format
      */
     public String generateProjectCode() {
         String part1 = generateRandomString(3, ALPHANUMERIC);
         String part2 = generateRandomString(3, ALPHANUMERIC);
         return part1 + "-" + part2;
     }
-
+    
     /**
-     * Generates a 6-digit OTP
+     * Generate a 6-digit OTP for email verification
      */
     public String generateOTP() {
-        return generateRandomString(6, NUMBERS);
+        return generateRandomString(6, NUMERIC);
     }
-
+    
     /**
-     * Generates a temporary password for supervisors
+     * Generate a temporary password for supervisors (8 characters)
      */
     public String generateTemporaryPassword() {
-        return generateRandomString(12, ALPHANUMERIC);
+        return generateRandomString(8, ALPHANUMERIC);
     }
-
+    
+    /**
+     * Helper method to generate random string of specified length using given characters
+     */
     private String generateRandomString(int length, String characters) {
-        StringBuilder sb = new StringBuilder(length);
+        StringBuilder result = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
-            sb.append(characters.charAt(random.nextInt(characters.length())));
+            result.append(characters.charAt(random.nextInt(characters.length())));
         }
-        return sb.toString();
+        return result.toString();
     }
 }

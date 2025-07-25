@@ -7,97 +7,78 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "reviews")
 public class Review {
-
+    
     @Id
-    @Column(length = 6)
+    @Size(min = 6, max = 6, message = "Review ID must be exactly 6 characters")
+    @Column(name = "id", length = 6, nullable = false)
     private String id;
-
-    @Column(nullable = false)
-    private Integer rating; // 1-5
-
-    @Column(columnDefinition = "TEXT")
+    
+    @NotNull(message = "Rating is required")
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 5, message = "Rating must be at most 5")
+    @Column(name = "rating", nullable = false)
+    private Integer rating;
+    
+    @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "task_id", nullable = false, unique = true)
-    private Task task;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supervisor_id", nullable = false)
-    private User supervisor;
-
+    
+    @NotBlank(message = "Task ID is required")
+    @Column(name = "task_id", length = 8, unique = true, nullable = false)
+    private String taskId; // Foreign Key to Task (mandatory, one-to-one)
+    
+    @NotBlank(message = "Supervisor ID is required")
+    @Column(name = "supervisor_id", length = 6, nullable = false)
+    private String supervisorId; // Foreign Key to User (mandatory)
+    
     @CreationTimestamp
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
+    
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    // Getters and Setters
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
+    
+    // Constructors
+    public Review() {}
+    
+    public Review(String id, Integer rating, String comment, String taskId, String supervisorId) {
         this.id = id;
-    }
-
-    public Integer getRating() {
-        return rating;
-    }
-
-    public void setRating(Integer rating) {
         this.rating = rating;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
         this.comment = comment;
+        this.taskId = taskId;
+        this.supervisorId = supervisorId;
     }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
-    }
-
-    public User getSupervisor() {
-        return supervisor;
-    }
-
-    public void setSupervisor(User supervisor) {
-        this.supervisor = supervisor;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    
+    // Getters and Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    
+    public Integer getRating() { return rating; }
+    public void setRating(Integer rating) { this.rating = rating; }
+    
+    public String getComment() { return comment; }
+    public void setComment(String comment) { this.comment = comment; }
+    
+    public String getTaskId() { return taskId; }
+    public void setTaskId(String taskId) { this.taskId = taskId; }
+    
+    public String getSupervisorId() { return supervisorId; }
+    public void setSupervisorId(String supervisorId) { this.supervisorId = supervisorId; }
+    
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
