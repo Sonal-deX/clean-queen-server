@@ -1,8 +1,9 @@
 package com.enterprise.cleanqueen.config;
 
-import com.enterprise.cleanqueen.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -12,13 +13,22 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.enterprise.cleanqueen.repository.UserRepository;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Configuration
 public class ApplicationConfig {
     
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
     
-    public ApplicationConfig(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Bean
+    public ObjectMapper objectMapper() {
+        return Jackson2ObjectMapperBuilder
+                .json()
+                .featuresToEnable(FAIL_ON_UNKNOWN_PROPERTIES) // Reject unknown properties
+                .build();
     }
     
     @Bean

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clean Queen API</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            letter-spacing: 0.01em;
+        }
+        
+        /* Better spacing for content */
+        .scalar-app {
+            --scalar-font-size: 14px;
+            --scalar-line-height: 1.6;
+            --scalar-letter-spacing: 0.02em;
+        }
+        
+        /* Custom spacing overrides */
+        * {
+            letter-spacing: 0.02em !important;
+        }
+        
+        p, div, span {
+            line-height: 1.7 !important;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            letter-spacing: 0.03em !important;
+            line-height: 1.4 !important;
+            margin-bottom: 1rem !important;
+        }
+        
+        code, pre {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+            letter-spacing: 0.01em !important;
+            line-height: 1.5 !important;
+        }
+    </style>
+</head>
+<body>
+    <script 
+        id="api-reference" 
+        data-url="/api/v3/api-docs"
+        data-configuration='{
+            "theme": "purple",
+            "layout": "modern",
+            "showSidebar": true,
+            "customCss": "body { font-family: system-ui; letter-spacing: 0.02em; line-height: 1.6; }"
+        }'>
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+</body>
+</html>
