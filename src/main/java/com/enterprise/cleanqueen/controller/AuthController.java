@@ -1,7 +1,6 @@
 package com.enterprise.cleanqueen.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.enterprise.cleanqueen.dto.auth.AuthRequest;
 import com.enterprise.cleanqueen.dto.auth.AuthResponse;
-import com.enterprise.cleanqueen.dto.auth.ErrorResponse;
 import com.enterprise.cleanqueen.dto.auth.OtpResendResponse;
 import com.enterprise.cleanqueen.dto.auth.OtpVerificationRequest;
 import com.enterprise.cleanqueen.dto.auth.RegisterRequest;
 import com.enterprise.cleanqueen.dto.auth.RegisterResponse;
+import com.enterprise.cleanqueen.dto.common.ErrorResponse;
 import com.enterprise.cleanqueen.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +32,7 @@ import jakarta.validation.Valid;
 @Tag(name = "Authentication", description = "User authentication and registration endpoints")
 public class AuthController {
     
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    // private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     
     @Autowired
     private AuthService authService;
@@ -60,7 +59,6 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request) {
         try {
             authService.register(request);
-            logger.info("Registration request processed for email: {}", request.getEmail());
             
             RegisterResponse response = new RegisterResponse(
                 true, 
@@ -70,7 +68,6 @@ public class AuthController {
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            logger.error("Registration failed for email: {}", request.getEmail(), e);
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
     }
@@ -97,12 +94,10 @@ public class AuthController {
             @Valid @RequestBody OtpVerificationRequest request) {
         try {
             AuthResponse authResponse = authService.verifyOtpAndActivateAccount(request);
-            logger.info("OTP verification successful for email: {}", request.getEmail());
             // Return the AuthResponse directly on success
             return ResponseEntity.ok(authResponse);
             
         } catch (Exception e) {
-            logger.error("OTP verification failed for email: {}", request.getEmail(), e);
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
     }
@@ -129,12 +124,10 @@ public class AuthController {
             @Valid @RequestBody AuthRequest request) {
         try {
             AuthResponse authResponse = authService.authenticate(request);
-            logger.info("Login successful for email: {}", request.getEmail());
             // Return the AuthResponse directly on success
             return ResponseEntity.ok(authResponse);
             
         } catch (Exception e) {
-            logger.error("Login failed for email: {}", request.getEmail(), e);
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
     }
@@ -161,7 +154,6 @@ public class AuthController {
             @RequestParam String email) {
         try {
             authService.resendOtp(email);
-            logger.info("OTP resent for email: {}", email);
 
             OtpResendResponse response = new OtpResendResponse(
                 true,
@@ -171,7 +163,6 @@ public class AuthController {
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            logger.error("OTP resend failed for email: {}", email, e);
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
     }

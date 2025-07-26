@@ -1,36 +1,26 @@
-package com.enterprise.cleanqueen.dto.common;
+package com.enterprise.cleanqueen.dto.user;
 
 import java.time.LocalDateTime;
 
-
-public class ApiSuccessResponse<T> {
-    
+public class UpdateProfileResponse {
     
     private boolean success;
-    
-    
     private String message;
-    
-    
-    private T data;
-    
-    
+    private String username;
+    private String phoneNumber;
     private LocalDateTime timestamp;
     
     // Constructors
-    public ApiSuccessResponse() {
-        this.success = true;
+    public UpdateProfileResponse() {
         this.timestamp = LocalDateTime.now();
     }
     
-    public ApiSuccessResponse(String message) {
+    public UpdateProfileResponse(boolean success, String message, String username, String phoneNumber) {
         this();
+        this.success = success;
         this.message = message;
-    }
-    
-    public ApiSuccessResponse(String message, T data) {
-        this(message);
-        this.data = data;
+        this.username = username;
+        this.phoneNumber = phoneNumber;
     }
     
     // Getters and Setters
@@ -40,8 +30,11 @@ public class ApiSuccessResponse<T> {
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
     
-    public T getData() { return data; }
-    public void setData(T data) { this.data = data; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }

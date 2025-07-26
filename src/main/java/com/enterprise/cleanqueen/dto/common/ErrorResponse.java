@@ -1,4 +1,4 @@
-package com.enterprise.cleanqueen.dto.auth;
+package com.enterprise.cleanqueen.dto.common;
 
 import java.time.LocalDateTime;
 
