@@ -12,7 +12,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 
@@ -83,7 +82,7 @@ public class SwaggerConfig {
                         new Server()
                                 .url("https://api.cleanqueen.com/api")
                                 .description("🚀 Production Server")))
-                .addSecurityItem(new SecurityRequirement().addList("JWT Authentication"))
+                
                 .components(new Components()
                         .addSecuritySchemes("JWT Authentication",
                                 new SecurityScheme()
