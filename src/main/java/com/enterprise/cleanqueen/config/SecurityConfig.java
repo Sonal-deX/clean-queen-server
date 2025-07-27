@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers("/assignments/customer").hasRole("CUSTOMER")
                 // Supervisor endpoints
                 .requestMatchers("/assignments/supervisor/**").hasRole("SUPERVISOR")
+                .requestMatchers("/reviews/**").hasRole("SUPERVISOR")
                 // All other endpoints require authentication
                 .anyRequest().authenticated() // All other endpoints require authentication
                 );
