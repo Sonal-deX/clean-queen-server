@@ -28,6 +28,9 @@ public class SecurityConfig {
                 .requestMatchers("/projects/**").hasRole("ADMIN")
                 // Customer endpoints
                 .requestMatchers("/requests/**").hasRole("CUSTOMER")
+                .requestMatchers("/assignments/customer").hasRole("CUSTOMER")
+                // Supervisor endpoints
+                .requestMatchers("/assignments/supervisor/**").hasRole("SUPERVISOR")
                 // All other endpoints require authentication
                 .anyRequest().authenticated() // All other endpoints require authentication
                 );
