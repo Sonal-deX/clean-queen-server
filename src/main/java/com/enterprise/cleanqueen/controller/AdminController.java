@@ -12,7 +12,7 @@ import com.enterprise.cleanqueen.dto.admin.CreateSupervisorRequest;
 import com.enterprise.cleanqueen.dto.admin.CreateSupervisorResponse;
 import com.enterprise.cleanqueen.dto.admin.SendProjectCodeRequest;
 import com.enterprise.cleanqueen.dto.admin.SendProjectCodeResponse;
-import com.enterprise.cleanqueen.dto.common.ErrorResponse;
+import com.enterprise.cleanqueen.dto.common.ApiErrorResponse;
 import com.enterprise.cleanqueen.service.AdminService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +65,7 @@ public class AdminController {
                 description = "❌ Creation failed - validation errors or email already exists",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         ),
         @ApiResponse(
@@ -73,7 +73,7 @@ public class AdminController {
                 description = "❌ Access denied - Admin role required",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         )
     })
@@ -82,13 +82,8 @@ public class AdminController {
     public ResponseEntity<?> createSupervisor(
             @Parameter(description = "Supervisor creation details", required = true)
             @Valid @RequestBody CreateSupervisorRequest request) {
-        try {
-            CreateSupervisorResponse response = adminService.createSupervisor(request);
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        CreateSupervisorResponse response = adminService.createSupervisor(request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -122,7 +117,7 @@ public class AdminController {
                 description = "❌ Send failed - Invalid project code or email",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         )
     })

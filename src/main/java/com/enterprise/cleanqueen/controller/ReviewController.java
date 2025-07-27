@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enterprise.cleanqueen.dto.common.ErrorResponse;
+import com.enterprise.cleanqueen.dto.common.ApiErrorResponse;
 import com.enterprise.cleanqueen.dto.review.CreateReviewRequest;
 import com.enterprise.cleanqueen.dto.review.CreateReviewResponse;
 import com.enterprise.cleanqueen.service.ReviewService;
@@ -87,7 +87,7 @@ public class ReviewController {
                 description = "❌ Review creation failed - Invalid task, not a leaf task, or already reviewed",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         ),
         @ApiResponse(
@@ -95,7 +95,7 @@ public class ReviewController {
                 description = "❌ Access denied - Supervisor not assigned to this project",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         )
     })
@@ -106,14 +106,9 @@ public class ReviewController {
             @Valid @RequestBody CreateReviewRequest request,
             Authentication authentication) {
 
-        try {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            CreateReviewResponse response = reviewService.createReview(request, userDetails.getUsername());
-            logger.info("Review created for task: {} with rating: {}", response.getTaskId(), response.getRating());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error creating review for task: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        CreateReviewResponse response = reviewService.createReview(request, userDetails.getUsername());
+        logger.info("Review created for task: {} with rating: {}", response.getTaskId(), response.getRating());
+        return ResponseEntity.ok(response);
     }
 }

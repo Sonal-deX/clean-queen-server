@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enterprise.cleanqueen.dto.common.ErrorResponse;
+import com.enterprise.cleanqueen.dto.common.ApiErrorResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectCreateRequest;
 import com.enterprise.cleanqueen.dto.project.ProjectCreateResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectUpdateRequest;
@@ -83,7 +83,7 @@ public class ProjectController {
                 description = "❌ Access denied - Admin role required",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         )
     })
@@ -93,14 +93,9 @@ public class ProjectController {
             @Parameter(description = "Project creation details with task hierarchy", required = true)
             @Valid @RequestBody ProjectCreateRequest request) {
 
-        try {
-            ProjectCreateResponse response = projectService.createProject(request);
-            logger.info("Project created: {} with code: {}", response.getProjectId(), response.getProjectCode());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error creating project: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        ProjectCreateResponse response = projectService.createProject(request);
+        logger.info("Project created: {} with code: {}", response.getProjectId(), response.getProjectCode());
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -143,7 +138,7 @@ public class ProjectController {
                 description = "❌ Project not found",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         )
     })
@@ -155,13 +150,8 @@ public class ProjectController {
             @Parameter(description = "Project update details with task hierarchy", required = true)
             @Valid @RequestBody ProjectUpdateRequest request) {
 
-        try {
-            ProjectUpdateResponse response = projectService.updateProject(projectId, request);
-            logger.info("Project updated: {} with {} total tasks", projectId, response.getTotalTasks());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error updating project {}: {}", projectId, e.getMessage());
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        ProjectUpdateResponse response = projectService.updateProject(projectId, request);
+        logger.info("Project updated: {} with {} total tasks", projectId, response.getTotalTasks());
+        return ResponseEntity.ok(response);
     }
 }

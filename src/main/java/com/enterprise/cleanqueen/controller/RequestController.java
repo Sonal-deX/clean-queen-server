@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enterprise.cleanqueen.dto.common.ErrorResponse;
+import com.enterprise.cleanqueen.dto.common.ApiErrorResponse;
 import com.enterprise.cleanqueen.dto.request.CreateRequestRequest;
 import com.enterprise.cleanqueen.dto.request.CreateRequestResponse;
 import com.enterprise.cleanqueen.service.RequestService;
@@ -70,7 +70,7 @@ public class RequestController {
                 description = "❌ Access denied - Customer role required",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         )
     })
@@ -81,14 +81,9 @@ public class RequestController {
             @Valid @RequestBody CreateRequestRequest request,
             Authentication authentication) {
 
-        try {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            CreateRequestResponse response = requestService.createRequest(request, userDetails.getUsername());
-            logger.info("Cleaning request created: {}", response.getRequestId());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error creating cleaning request: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        CreateRequestResponse response = requestService.createRequest(request, userDetails.getUsername());
+        logger.info("Cleaning request created: {}", response.getRequestId());
+        return ResponseEntity.ok(response);
     }
 }

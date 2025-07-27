@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enterprise.cleanqueen.dto.common.ErrorResponse;
+import com.enterprise.cleanqueen.dto.common.ApiErrorResponse;
 import com.enterprise.cleanqueen.dto.user.UpdateProfileRequest;
 import com.enterprise.cleanqueen.dto.user.UpdateProfileResponse;
 import com.enterprise.cleanqueen.dto.user.UserProfileResponse;
@@ -62,20 +62,15 @@ public class UserController {
             description = "❌ Unauthorized - Invalid or missing token",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponse.class)
+                schema = @Schema(implementation = ApiErrorResponse.class)
             )
         )
     })
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(Authentication authentication) {
-        try {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            UserProfileResponse response = userService.getUserProfile(userDetails.getUsername());
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserProfileResponse response = userService.getUserProfile(userDetails.getUsername());
+        return ResponseEntity.ok(response);
     }
     
     @Operation(
@@ -108,7 +103,7 @@ public class UserController {
             description = "❌ Update failed - validation errors or incorrect current password",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponse.class)
+                schema = @Schema(implementation = ApiErrorResponse.class)
             )
         )
     })
@@ -117,13 +112,8 @@ public class UserController {
             @Parameter(description = "Profile update details", required = true)
             @Valid @RequestBody UpdateProfileRequest request,
             Authentication authentication) {
-        try {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            UpdateProfileResponse response = userService.updateUserProfile(userDetails.getUsername(), request);
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UpdateProfileResponse response = userService.updateUserProfile(userDetails.getUsername(), request);
+        return ResponseEntity.ok(response);
     }
 }

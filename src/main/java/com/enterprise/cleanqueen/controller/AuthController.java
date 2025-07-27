@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enterprise.cleanqueen.dto.auth.AuthRequest;
@@ -16,7 +15,8 @@ import com.enterprise.cleanqueen.dto.auth.RefreshTokenRequest;
 import com.enterprise.cleanqueen.dto.auth.RefreshTokenResponse;
 import com.enterprise.cleanqueen.dto.auth.RegisterRequest;
 import com.enterprise.cleanqueen.dto.auth.RegisterResponse;
-import com.enterprise.cleanqueen.dto.common.ErrorResponse;
+import com.enterprise.cleanqueen.dto.auth.ResendOtpRequest;
+import com.enterprise.cleanqueen.dto.common.ApiErrorResponse;
 import com.enterprise.cleanqueen.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,26 +50,21 @@ public class AuthController {
         @ApiResponse(
                 responseCode = "400",
                 description = "Registration failed - validation errors or email already exists",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         )
     })
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @Parameter(description = "User registration details", required = true)
             @Valid @RequestBody RegisterRequest request) {
-        try {
-            authService.register(request);
+        authService.register(request);
 
-            RegisterResponse response = new RegisterResponse(
-                    true,
-                    "Registration successful. Please check your email for OTP verification.",
-                    request.getEmail()
-            );
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        RegisterResponse response = new RegisterResponse(
+                true,
+                "Registration successful. Please check your email for OTP verification.",
+                request.getEmail()
+        );
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -85,21 +80,16 @@ public class AuthController {
         @ApiResponse(
                 responseCode = "400",
                 description = "Invalid or expired OTP",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         )
     })
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(
             @Parameter(description = "OTP verification details", required = true)
             @Valid @RequestBody OtpVerificationRequest request) {
-        try {
-            AuthResponse authResponse = authService.verifyOtpAndActivateAccount(request);
-            // Return the AuthResponse directly on success
-            return ResponseEntity.ok(authResponse);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        AuthResponse authResponse = authService.verifyOtpAndActivateAccount(request);
+        // Return the AuthResponse directly on success
+        return ResponseEntity.ok(authResponse);
     }
 
     @Operation(
@@ -115,21 +105,15 @@ public class AuthController {
         @ApiResponse(
                 responseCode = "400",
                 description = "Login failed - invalid credentials or account not verified",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         )
     })
-    @PostMapping("/login")
+        @PostMapping("/authenticate")
     public ResponseEntity<?> authenticate(
-            @Parameter(description = "Login credentials", required = true)
+            @Parameter(description = "User authentication details", required = true)
             @Valid @RequestBody AuthRequest request) {
-        try {
-            AuthResponse authResponse = authService.authenticate(request);
-            // Return the AuthResponse directly on success
-            return ResponseEntity.ok(authResponse);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        AuthResponse authResponse = authService.authenticate(request);
+        return ResponseEntity.ok(authResponse);
     }
 
     @Operation(
@@ -145,26 +129,15 @@ public class AuthController {
         @ApiResponse(
                 responseCode = "400",
                 description = "Resend failed - user not found or already verified",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         )
     })
-    @PostMapping("/resend-otp")
+        @PostMapping("/resend-otp")
     public ResponseEntity<?> resendOtp(
-            @Parameter(description = "Email address to resend OTP to", required = true, example = "user@example.com")
-            @RequestParam String email) {
-        try {
-            authService.resendOtp(email);
-
-            OtpResendResponse response = new OtpResendResponse(
-                    true,
-                    "OTP has been resent to your email.",
-                    email
-            );
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+            @Parameter(description = "Email to resend OTP", required = true)
+            @Valid @RequestBody ResendOtpRequest request) {
+        authService.resendOtp(request.getEmail());
+        return ResponseEntity.ok().body("OTP resent successfully");
     }
 
     @Operation(
@@ -204,7 +177,7 @@ public class AuthController {
                 description = "❌ Refresh failed - invalid or expired refresh token",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         )
     })

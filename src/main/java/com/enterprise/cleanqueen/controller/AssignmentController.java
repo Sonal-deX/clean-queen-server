@@ -17,7 +17,7 @@ import com.enterprise.cleanqueen.dto.assignment.AssignSupervisorRequest;
 import com.enterprise.cleanqueen.dto.assignment.AssignmentResponse;
 import com.enterprise.cleanqueen.dto.assignment.SupervisorExitRequest;
 import com.enterprise.cleanqueen.dto.assignment.SupervisorExitResponse;
-import com.enterprise.cleanqueen.dto.common.ErrorResponse;
+import com.enterprise.cleanqueen.dto.common.ApiErrorResponse;
 import com.enterprise.cleanqueen.service.AssignmentService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -78,7 +78,7 @@ public class AssignmentController {
                 description = "❌ Assignment failed - Invalid project code or project not available",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         )
     })
@@ -89,15 +89,10 @@ public class AssignmentController {
             @Valid @RequestBody AssignCustomerRequest request,
             Authentication authentication) {
 
-        try {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            AssignmentResponse response = assignmentService.assignCustomerToProject(request, userDetails.getUsername());
-            logger.info("Customer assigned to project: {}", response.getProjectCode());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error assigning customer to project: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        AssignmentResponse response = assignmentService.assignCustomerToProject(request, userDetails.getUsername());
+        logger.info("Customer assigned to project: {}", response.getProjectCode());
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -137,7 +132,7 @@ public class AssignmentController {
                 description = "❌ Assignment failed - Invalid project code or already assigned",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         )
     })
@@ -148,15 +143,10 @@ public class AssignmentController {
             @Valid @RequestBody AssignSupervisorRequest request,
             Authentication authentication) {
 
-        try {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            AssignmentResponse response = assignmentService.assignSupervisorToProject(request, userDetails.getUsername());
-            logger.info("Supervisor assigned to project: {}", response.getProjectCode());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error assigning supervisor to project: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        AssignmentResponse response = assignmentService.assignSupervisorToProject(request, userDetails.getUsername());
+        logger.info("Supervisor assigned to project: {}", response.getProjectCode());
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -196,7 +186,7 @@ public class AssignmentController {
                 description = "❌ Exit failed - Not assigned to project or invalid project",
                 content = @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = ErrorResponse.class)
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         )
     })
@@ -207,14 +197,9 @@ public class AssignmentController {
             @Valid @RequestBody SupervisorExitRequest request,
             Authentication authentication) {
 
-        try {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            SupervisorExitResponse response = assignmentService.supervisorExitProject(request, userDetails.getUsername());
-            logger.info("Supervisor exited from project: {}", response.getProjectId());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error supervisor exiting project: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        SupervisorExitResponse response = assignmentService.supervisorExitProject(request, userDetails.getUsername());
+        logger.info("Supervisor exited from project: {}", response.getProjectId());
+        return ResponseEntity.ok(response);
     }
 }
