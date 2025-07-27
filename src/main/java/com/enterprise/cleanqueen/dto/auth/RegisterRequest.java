@@ -2,6 +2,7 @@
 package com.enterprise.cleanqueen.dto.auth;
 
 import com.enterprise.cleanqueen.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -10,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Schema(description = "User registration request")
+@JsonIgnoreProperties(ignoreUnknown = false) // Strict: reject unknown properties
 public class RegisterRequest {
     
     @Schema(description = "Username for the account", example = "john_doe", required = true)

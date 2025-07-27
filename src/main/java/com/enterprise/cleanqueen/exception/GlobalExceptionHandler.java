@@ -22,6 +22,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.enterprise.cleanqueen.dto.common.ApiErrorResponse;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -116,11 +120,35 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException ex, HttpServletRequest request) {
-        logger.warn("Malformed JSON request: {} | Path: {}", ex.getMessage(), request.getRequestURI());
+        
+        String message = "Malformed JSON request. Please check your request body.";
+        
+        // Handle specific JSON parsing errors
+        Throwable cause = ex.getCause();
+        if (cause instanceof UnrecognizedPropertyException upe) {
+            message = String.format("Unknown property '%s'. Please check the field names in your request.", 
+                upe.getPropertyName());
+        } else if (cause instanceof InvalidFormatException ife) {
+            message = String.format("Invalid value format for field '%s'. Expected type: %s", 
+                ife.getPath().get(0).getFieldName(), 
+                ife.getTargetType().getSimpleName());
+        } else if (cause instanceof MismatchedInputException mie) {
+            if (!mie.getPath().isEmpty()) {
+                message = String.format("Invalid input for field '%s'. Please check the data type and format.", 
+                    mie.getPath().get(0).getFieldName());
+            }
+        } else if (cause instanceof JsonMappingException jme) {
+            if (!jme.getPath().isEmpty()) {
+                message = String.format("JSON mapping error for field '%s'. Please check the field structure.", 
+                    jme.getPath().get(0).getFieldName());
+            }
+        }
+        
+        logger.warn("JSON parsing error: {} | Path: {}", message, request.getRequestURI());
         
         ApiErrorResponse error = new ApiErrorResponse(
             false,
-            "Malformed JSON request. Please check your request body.",
+            message,
             HttpStatus.BAD_REQUEST.value(),
             LocalDateTime.now(),
             request.getRequestURI()
