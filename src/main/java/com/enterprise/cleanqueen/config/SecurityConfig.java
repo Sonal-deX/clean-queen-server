@@ -14,16 +14,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Disable CSRF for API
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authz -> authz
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for API
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authz -> authz
+                // Public endpoints
                 .requestMatchers("/health/**").permitAll() // Allow health endpoints
                 .requestMatchers("/auth/**").permitAll() // Allow authentication endpoints
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Allow Swagger
-                .requestMatchers("/docs.html").permitAll()  // Add this line
+                .requestMatchers("/docs.html").permitAll() // Add this line
+
+                // Admin only endpoints
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // Customer endpoints
+                .requestMatchers("/requests/**").hasRole("CUSTOMER")
+                // All other endpoints require authentication
                 .anyRequest().authenticated() // All other endpoints require authentication
-            );
-        
+                );
+
         return http.build();
     }
 }
