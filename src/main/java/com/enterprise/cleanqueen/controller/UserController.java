@@ -15,6 +15,7 @@ import com.enterprise.cleanqueen.dto.user.UpdateProfileRequest;
 import com.enterprise.cleanqueen.dto.user.UpdateProfileResponse;
 import com.enterprise.cleanqueen.dto.user.UserProfileResponse;
 import com.enterprise.cleanqueen.service.UserService;
+import com.enterprise.cleanqueen.util.ValidationUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,6 +37,9 @@ public class UserController {
     
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private ValidationUtil validationUtil;
     
     @Operation(
         summary = "Get User Profile",
@@ -112,6 +116,22 @@ public class UserController {
             @Parameter(description = "Profile update details", required = true)
             @Valid @RequestBody UpdateProfileRequest request,
             Authentication authentication) {
+        
+        // Validate username format if provided
+        if (request.getUsername() != null && !validationUtil.isValidUsername(request.getUsername())) {
+            throw new RuntimeException("Username must be 3-50 characters and contain only letters, numbers, dots, hyphens, and underscores");
+        }
+        
+        // Validate phone number format if provided
+        if (request.getPhoneNumber() != null && !validationUtil.isValidPhoneNumber(request.getPhoneNumber())) {
+            throw new RuntimeException("Invalid phone number format");
+        }
+        
+        // Validate new password format if provided
+        if (request.getNewPassword() != null && !validationUtil.isValidPassword(request.getNewPassword())) {
+            throw new RuntimeException("Password must be 6-100 characters long");
+        }
+        
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         UpdateProfileResponse response = userService.updateUserProfile(userDetails.getUsername(), request);
         return ResponseEntity.ok(response);

@@ -23,12 +23,14 @@ import com.enterprise.cleanqueen.dto.auth.RegisterRequest;
 import com.enterprise.cleanqueen.entity.OtpVerification;
 import com.enterprise.cleanqueen.entity.User;
 import com.enterprise.cleanqueen.enums.Role;
+import com.enterprise.cleanqueen.exception.BusinessException;
 import com.enterprise.cleanqueen.repository.OtpVerificationRepository;
 import com.enterprise.cleanqueen.repository.UserRepository;
 import com.enterprise.cleanqueen.service.AuthService;
 import com.enterprise.cleanqueen.service.EmailService;
 import com.enterprise.cleanqueen.service.JwtService;
 import com.enterprise.cleanqueen.util.CodeGenerator;
+import com.enterprise.cleanqueen.util.ValidationUtil;
 
 @Service
 @Transactional
@@ -60,6 +62,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private ValidationUtil validationUtil;
+
     @Value("${app.admin.email}")
     private String adminEmail;
 
@@ -68,47 +73,70 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void register(RegisterRequest request) {
+        // Validate input fields
+        if (!validationUtil.isValidEmail(request.getEmail())) {
+            throw new BusinessException("Invalid email format");
+        }
+
+        if (!validationUtil.isValidUsername(request.getUsername())) {
+            throw new BusinessException("Username must be 3-50 characters and contain only letters, numbers, dots, hyphens, and underscores");
+        }
+
+        if (!validationUtil.isValidPassword(request.getPassword())) {
+            throw new BusinessException("Password must be 6-100 characters long");
+        }
+
+        if (request.getPhoneNumber() != null && !validationUtil.isValidPhoneNumber(request.getPhoneNumber())) {
+            throw new BusinessException("Invalid phone number format");
+        }
+
+        // Sanitize inputs for security
+        String cleanEmail = validationUtil.sanitizeInput(request.getEmail()).toLowerCase();
+        String cleanUsername = validationUtil.sanitizeInput(request.getUsername());
+        String cleanPhoneNumber = request.getPhoneNumber() != null ? 
+            validationUtil.sanitizeInput(request.getPhoneNumber()) : null;
+
         // Check for existing verified user
-        if (userRepository.existsByEmail(request.getEmail())) {
-            User existingUser = userRepository.findByEmail(request.getEmail()).get();
+        if (userRepository.existsByEmail(cleanEmail)) {
+            User existingUser = userRepository.findByEmail(cleanEmail).get();
 
             // If user is verified, don't allow re-registration
             if (existingUser.getIsVerified()) {
-                throw new RuntimeException("Email is already registered and verified");
+                throw new BusinessException("Email is already registered and verified");
             }
 
             // If user is not verified, check if OTP is still valid
             boolean hasValidOtp = otpRepository
-                    .findTopByEmailAndIsUsedFalseOrderByCreatedAtDesc(request.getEmail())
+                    .findTopByEmailAndIsUsedFalseOrderByCreatedAtDesc(cleanEmail)
                     .map(otp -> !otp.isExpired())
                     .orElse(false);
 
             if (hasValidOtp) {
-                throw new RuntimeException("Registration pending. Please verify your email with the OTP sent, or wait for it to expire before re-registering.");
+                throw new BusinessException("Registration pending. Please verify your email with the OTP sent, or wait for it to expire before re-registering.");
             }
 
             // OTP expired and user not verified - allow re-registration
             // Clean up old unverified user and their OTPs
-            otpRepository.deleteByEmail(request.getEmail());
+            otpRepository.deleteByEmail(cleanEmail);
             userRepository.delete(existingUser);
         }
 
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username is already taken");
+        if (userRepository.existsByUsername(cleanUsername)) {
+            throw new BusinessException("Username is already taken");
         }
 
         // Only allow CUSTOMER and ADMIN registration (SUPERVISOR created by admin only)
         if (request.getRole() == Role.SUPERVISOR) {
-            throw new RuntimeException("Supervisors can only be created by admin");
+            throw new BusinessException("Supervisors can only be created by admin");
         }
 
         // Create user entity
         User user = new User();
         user.setId(codeGenerator.generateUserId());
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
+        user.setUsername(cleanUsername);
+        user.setEmail(cleanEmail);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setPhoneNumber(request.getPhoneNumber());
+        user.setPhoneNumber(cleanPhoneNumber);
         user.setRole(request.getRole());
         user.setIsActive(true);
         user.setIsVerified(false); // Will be verified after OTP confirmation
@@ -118,7 +146,7 @@ public class AuthServiceImpl implements AuthService {
         logger.info("User registered successfully: {}", user.getEmail());
 
         // Generate and send OTP
-        sendOtpToUser(request.getEmail(), request.getRole());
+        sendOtpToUser(cleanEmail, request.getRole());
     }
 
     @Override

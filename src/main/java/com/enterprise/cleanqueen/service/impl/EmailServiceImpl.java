@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.enterprise.cleanqueen.exception.BusinessException;
 import com.enterprise.cleanqueen.service.EmailService;
+import com.enterprise.cleanqueen.util.ValidationUtil;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -19,74 +22,129 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Autowired
+    private ValidationUtil validationUtil;
+
     @Value("${spring.mail.username}")
     private String fromEmail;
 
     @Override
+    @Async("taskExecutor")
     public void sendOtpEmail(String toEmail, String otp) {
+        // Validate email format
+        if (!validationUtil.isValidEmail(toEmail)) {
+            logger.error("Invalid email format: {}", toEmail);
+            throw new BusinessException("Invalid email format");
+        }
+
+        // Sanitize inputs for security
+        String cleanEmail = validationUtil.sanitizeInput(toEmail);
+        String cleanOtp = validationUtil.sanitizeInput(otp);
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
-            message.setTo(toEmail);
+            message.setTo(cleanEmail);
             message.setSubject("Clean Queen - Email Verification OTP");
-            message.setText(buildOtpEmailContent(otp));
+            message.setText(buildOtpEmailContent(cleanOtp));
 
             mailSender.send(message);
-            logger.info("OTP email sent successfully to: {}", toEmail);
+            logger.info("OTP email sent successfully to: {}", cleanEmail);
         } catch (MailException e) {
-            logger.error("Failed to send OTP email to: {}", toEmail, e);
-            throw new RuntimeException("Failed to send OTP email", e);
+            logger.error("Failed to send OTP email to: {}", cleanEmail, e);
+            throw new BusinessException("Failed to send OTP email: " + e.getMessage());
         }
     }
 
     @Override
+    @Async("taskExecutor")
     public void sendSupervisorPasswordEmail(String toEmail, String temporaryPassword) {
+        // Validate email format
+        if (!validationUtil.isValidEmail(toEmail)) {
+            logger.error("Invalid email format: {}", toEmail);
+            throw new BusinessException("Invalid email format");
+        }
+
+        // Sanitize inputs for security
+        String cleanEmail = validationUtil.sanitizeInput(toEmail);
+        String cleanPassword = validationUtil.sanitizeInput(temporaryPassword);
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
-            message.setTo(toEmail);
+            message.setTo(cleanEmail);
             message.setSubject("Clean Queen - Supervisor Account Created");
-            message.setText(buildSupervisorPasswordEmailContent(temporaryPassword));
+            message.setText(buildSupervisorPasswordEmailContent(cleanPassword));
 
             mailSender.send(message);
-            logger.info("Temporary password email sent successfully to: {}", toEmail);
+            logger.info("Temporary password email sent successfully to: {}", cleanEmail);
         } catch (MailException e) {
-            logger.error("Failed to send temporary password email to: {}", toEmail, e);
-            throw new RuntimeException("Failed to send temporary password email", e);
+            logger.error("Failed to send temporary password email to: {}", cleanEmail, e);
+            throw new BusinessException("Failed to send temporary password email: " + e.getMessage());
         }
     }
 
     @Override
+    @Async("taskExecutor")
     public void sendRequestConfirmationEmail(String toEmail, String requestId, String customerName) {
+        // Validate email format
+        if (!validationUtil.isValidEmail(toEmail)) {
+            logger.error("Invalid email format: {}", toEmail);
+            throw new BusinessException("Invalid email format");
+        }
+
+        // Sanitize inputs for security
+        String cleanEmail = validationUtil.sanitizeInput(toEmail);
+        String cleanRequestId = validationUtil.sanitizeInput(requestId);
+        String cleanCustomerName = validationUtil.sanitizeInput(customerName);
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
-            message.setTo(toEmail);
+            message.setTo(cleanEmail);
             message.setSubject("Clean Queen - Request Submitted Successfully");
-            message.setText(buildRequestConfirmationEmailContent(requestId, customerName));
+            message.setText(buildRequestConfirmationEmailContent(cleanRequestId, cleanCustomerName));
 
             mailSender.send(message);
-            logger.info("Request confirmation email sent to: {}", toEmail);
-        } catch (Exception e) {
-            logger.error("Failed to send request confirmation email to: {}", toEmail, e);
-            throw new RuntimeException("Failed to send confirmation email", e);
+            logger.info("Request confirmation email sent to: {}", cleanEmail);
+        } catch (MailException e) {
+            logger.error("Failed to send request confirmation email to: {}", cleanEmail, e);
+            throw new BusinessException("Failed to send confirmation email: " + e.getMessage());
         }
     }
 
     @Override
+    @Async("taskExecutor")
     public void sendProjectCodeEmail(String toEmail, String projectCode, String projectName) {
+        // Validate email format
+        if (!validationUtil.isValidEmail(toEmail)) {
+            logger.error("Invalid email format: {}", toEmail);
+            throw new BusinessException("Invalid email format");
+        }
+
+        // Validate project code format
+        if (!validationUtil.isValidProjectCode(projectCode)) {
+            logger.error("Invalid project code format: {}", projectCode);
+            throw new BusinessException("Invalid project code format");
+        }
+
+        // Sanitize inputs for security
+        String cleanEmail = validationUtil.sanitizeInput(toEmail);
+        String cleanProjectCode = validationUtil.sanitizeInput(projectCode);
+        String cleanProjectName = validationUtil.sanitizeInput(projectName);
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
-            message.setTo(toEmail);
+            message.setTo(cleanEmail);
             message.setSubject("Clean Queen - Project Assignment Code");
-            message.setText(buildProjectCodeEmailContent(projectCode, projectName));
+            message.setText(buildProjectCodeEmailContent(cleanProjectCode, cleanProjectName));
 
             mailSender.send(message);
-            logger.info("Project code email sent successfully to: {}", toEmail);
-        } catch (Exception e) {
-            logger.error("Failed to send project code email to: {}", toEmail, e);
-            throw new RuntimeException("Failed to send project code email", e);
+            logger.info("Project code email sent successfully to: {}", cleanEmail);
+        } catch (MailException e) {
+            logger.error("Failed to send project code email to: {}", cleanEmail, e);
+            throw new BusinessException("Failed to send project code email: " + e.getMessage());
         }
     }
 
@@ -129,35 +187,46 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private String buildRequestConfirmationEmailContent(String requestId, String customerName) {
-        return String.format(
-                "Dear %s,\n\n"
-                + "Thank you for choosing Clean Queen services!\n\n"
-                + "Your cleaning request has been submitted successfully.\n\n"
-                + "Request Details:\n"
-                + "Request ID: %s\n"
-                + "Status: Pending Review\n\n"
-                + "Our team will review your request and contact you within 24 hours to discuss the details and schedule your cleaning service.\n\n"
-                + "For any questions, please contact us or reference your Request ID.\n\n"
-                + "Best regards,\n"
-                + "Clean Queen Customer Service Team",
+        return String.format("""
+                             Dear %s,
+                             
+                             Thank you for choosing Clean Queen services!
+                             
+                             Your cleaning request has been submitted successfully.
+                             
+                             Request Details:
+                             Request ID: %s
+                             Status: Pending Review
+                             
+                             Our team will review your request and contact you within 24 hours to discuss the details and schedule your cleaning service.
+                             
+                             For any questions, please contact us or reference your Request ID.
+                             
+                             Best regards,
+                             Clean Queen Customer Service Team""",
                 customerName, requestId
         );
     }
 
     private String buildProjectCodeEmailContent(String projectCode, String projectName) {
-        return String.format(
-                "Dear Customer,\n\n"
-                + "Your cleaning project has been created and is ready for assignment.\n\n"
-                + "Project Details:\n"
-                + "Project Name: %s\n"
-                + "Project Code: %s\n\n"
-                + "To assign yourself to this project:\n"
-                + "1. Login to the Clean Queen system\n"
-                + "2. Use the project assignment feature\n"
-                + "3. Enter the project code above\n\n"
-                + "Once assigned, you'll be able to track project progress and communicate with our team.\n\n"
-                + "Best regards,\n"
-                + "Clean Queen Project Team",
+        return String.format("""
+                             Dear Customer,
+                             
+                             Your cleaning project has been created and is ready for assignment.
+                             
+                             Project Details:
+                             Project Name: %s
+                             Project Code: %s
+                             
+                             To assign yourself to this project:
+                             1. Login to the Clean Queen system
+                             2. Use the project assignment feature
+                             3. Enter the project code above
+                             
+                             Once assigned, you'll be able to track project progress and communicate with our team.
+                             
+                             Best regards,
+                             Clean Queen Project Team""",
                 projectName, projectCode
         );
     }

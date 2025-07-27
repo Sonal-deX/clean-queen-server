@@ -11,11 +11,13 @@ import com.enterprise.cleanqueen.dto.request.CreateRequestResponse;
 import com.enterprise.cleanqueen.entity.CleaningRequest;
 import com.enterprise.cleanqueen.entity.User;
 import com.enterprise.cleanqueen.enums.CleaningRequestStatus;
+import com.enterprise.cleanqueen.exception.BusinessException;
 import com.enterprise.cleanqueen.repository.CleaningRequestRepository;
 import com.enterprise.cleanqueen.repository.UserRepository;
 import com.enterprise.cleanqueen.service.EmailService;
 import com.enterprise.cleanqueen.service.RequestService;
 import com.enterprise.cleanqueen.util.CodeGenerator;
+import com.enterprise.cleanqueen.util.ValidationUtil;
 
 
 @Service
@@ -36,19 +38,39 @@ public class RequestServiceImpl implements RequestService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private ValidationUtil validationUtil;
+
     @Override
     public CreateRequestResponse createRequest(CreateRequestRequest request, String userEmail) {
+        // Validate email format
+        if (!validationUtil.isValidEmail(userEmail)) {
+            throw new BusinessException("Invalid user email format");
+        }
+
+        // Validate phone number if provided
+        if (request.getPhoneNumber() != null && !validationUtil.isValidPhoneNumber(request.getPhoneNumber())) {
+            throw new BusinessException("Invalid phone number format");
+        }
+
+        // Sanitize inputs for security
+        String cleanUserEmail = validationUtil.sanitizeInput(userEmail).toLowerCase();
+        String cleanName = validationUtil.sanitizeInput(request.getName());
+        String cleanPhoneNumber = request.getPhoneNumber() != null ? 
+            validationUtil.sanitizeInput(request.getPhoneNumber()) : null;
+        String cleanDescription = validationUtil.sanitizeInput(request.getDescription());
+
         // Find user
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(cleanUserEmail)
+                .orElseThrow(() -> new BusinessException("User not found"));
 
         // Create cleaning request
         CleaningRequest cleaningRequest = new CleaningRequest();
         cleaningRequest.setId(codeGenerator.generateRequestId());
-        cleaningRequest.setName(request.getName());
+        cleaningRequest.setName(cleanName);
         cleaningRequest.setEmail(user.getEmail()); // Use authenticated user's email
-        cleaningRequest.setPhoneNumber(request.getPhoneNumber());
-        cleaningRequest.setDescription(request.getDescription());
+        cleaningRequest.setPhoneNumber(cleanPhoneNumber);
+        cleaningRequest.setDescription(cleanDescription);
         cleaningRequest.setStatus(CleaningRequestStatus.PENDING);
         cleaningRequest.setUserId(user.getId());
 
@@ -59,7 +81,7 @@ public class RequestServiceImpl implements RequestService {
         emailService.sendRequestConfirmationEmail(
                 user.getEmail(),
                 cleaningRequest.getId(),
-                request.getName()
+                cleanName
         );
 
         logger.info("Cleaning request created successfully: {}", cleaningRequest.getId());
