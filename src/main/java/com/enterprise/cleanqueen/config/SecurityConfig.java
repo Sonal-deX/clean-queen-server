@@ -25,6 +25,7 @@ public class SecurityConfig {
 
                 // Admin only endpoints
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/projects/**").hasRole("ADMIN")
                 // Customer endpoints
                 .requestMatchers("/requests/**").hasRole("CUSTOMER")
                 // All other endpoints require authentication
