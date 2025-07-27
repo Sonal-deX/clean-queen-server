@@ -209,7 +209,7 @@ public class AuthController {
         )
     })
     @PostMapping("/refresh")
-    public ResponseEntity<RefreshTokenResponse> refreshToken(
+    public ResponseEntity<?> refreshToken(
             @Parameter(description = "Refresh token details", required = true)
             @Valid @RequestBody RefreshTokenRequest request) {
 

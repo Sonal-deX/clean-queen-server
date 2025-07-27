@@ -128,7 +128,7 @@ public class AdminController {
     })
     @PostMapping("/send-project-code")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SendProjectCodeResponse> sendProjectCode(
+    public ResponseEntity<?> sendProjectCode(
             @Parameter(description = "Project code email details", required = true)
             @Valid @RequestBody SendProjectCodeRequest request) {
 

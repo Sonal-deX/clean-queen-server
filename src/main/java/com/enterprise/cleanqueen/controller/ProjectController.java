@@ -89,13 +89,18 @@ public class ProjectController {
     })
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProjectCreateResponse> createProject(
+    public ResponseEntity<?> createProject(
             @Parameter(description = "Project creation details with task hierarchy", required = true)
             @Valid @RequestBody ProjectCreateRequest request) {
 
-        ProjectCreateResponse response = projectService.createProject(request);
-        logger.info("Project created: {} with code: {}", response.getProjectId(), response.getProjectCode());
-        return ResponseEntity.ok(response);
+        try {
+            ProjectCreateResponse response = projectService.createProject(request);
+            logger.info("Project created: {} with code: {}", response.getProjectId(), response.getProjectCode());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error creating project: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
     }
 
     @Operation(
@@ -144,14 +149,19 @@ public class ProjectController {
     })
     @PutMapping("/{projectId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProjectUpdateResponse> updateProject(
+    public ResponseEntity<?> updateProject(
             @Parameter(description = "Project ID to update", required = true, example = "ABC123")
             @PathVariable String projectId,
             @Parameter(description = "Project update details with task hierarchy", required = true)
             @Valid @RequestBody ProjectUpdateRequest request) {
 
-        ProjectUpdateResponse response = projectService.updateProject(projectId, request);
-        logger.info("Project updated: {} with {} total tasks", projectId, response.getTotalTasks());
-        return ResponseEntity.ok(response);
+        try {
+            ProjectUpdateResponse response = projectService.updateProject(projectId, request);
+            logger.info("Project updated: {} with {} total tasks", projectId, response.getTotalTasks());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error updating project {}: {}", projectId, e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
     }
 }

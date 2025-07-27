@@ -84,15 +84,20 @@ public class AssignmentController {
     })
     @PostMapping("/customer")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<AssignmentResponse> assignCustomer(
+    public ResponseEntity<?> assignCustomer(
             @Parameter(description = "Project assignment details", required = true)
             @Valid @RequestBody AssignCustomerRequest request,
             Authentication authentication) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        AssignmentResponse response = assignmentService.assignCustomerToProject(request, userDetails.getUsername());
-        logger.info("Customer assigned to project: {}", response.getProjectCode());
-        return ResponseEntity.ok(response);
+        try {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            AssignmentResponse response = assignmentService.assignCustomerToProject(request, userDetails.getUsername());
+            logger.info("Customer assigned to project: {}", response.getProjectCode());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error assigning customer to project: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
     }
 
     @Operation(
@@ -138,15 +143,20 @@ public class AssignmentController {
     })
     @PostMapping("/supervisor")
     @PreAuthorize("hasRole('SUPERVISOR')")
-    public ResponseEntity<AssignmentResponse> assignSupervisor(
+    public ResponseEntity<?> assignSupervisor(
             @Parameter(description = "Project assignment details", required = true)
             @Valid @RequestBody AssignSupervisorRequest request,
             Authentication authentication) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        AssignmentResponse response = assignmentService.assignSupervisorToProject(request, userDetails.getUsername());
-        logger.info("Supervisor assigned to project: {}", response.getProjectCode());
-        return ResponseEntity.ok(response);
+        try {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            AssignmentResponse response = assignmentService.assignSupervisorToProject(request, userDetails.getUsername());
+            logger.info("Supervisor assigned to project: {}", response.getProjectCode());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error assigning supervisor to project: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
     }
 
     @Operation(
@@ -192,14 +202,19 @@ public class AssignmentController {
     })
     @PostMapping("/supervisor/exit")
     @PreAuthorize("hasRole('SUPERVISOR')")
-    public ResponseEntity<SupervisorExitResponse> supervisorExit(
+    public ResponseEntity<?> supervisorExit(
             @Parameter(description = "Project exit details", required = true)
             @Valid @RequestBody SupervisorExitRequest request,
             Authentication authentication) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        SupervisorExitResponse response = assignmentService.supervisorExitProject(request, userDetails.getUsername());
-        logger.info("Supervisor exited from project: {}", response.getProjectId());
-        return ResponseEntity.ok(response);
+        try {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            SupervisorExitResponse response = assignmentService.supervisorExitProject(request, userDetails.getUsername());
+            logger.info("Supervisor exited from project: {}", response.getProjectId());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error supervisor exiting project: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
     }
 }

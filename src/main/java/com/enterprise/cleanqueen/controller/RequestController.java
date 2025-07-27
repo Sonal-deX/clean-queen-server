@@ -76,14 +76,19 @@ public class RequestController {
     })
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<CreateRequestResponse> createRequest(
+    public ResponseEntity<?> createRequest(
             @Parameter(description = "Cleaning request details", required = true)
             @Valid @RequestBody CreateRequestRequest request,
             Authentication authentication) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        CreateRequestResponse response = requestService.createRequest(request, userDetails.getUsername());
-        logger.info("Cleaning request created: {}", response.getRequestId());
-        return ResponseEntity.ok(response);
+        try {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            CreateRequestResponse response = requestService.createRequest(request, userDetails.getUsername());
+            logger.info("Cleaning request created: {}", response.getRequestId());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error creating cleaning request: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
     }
 }

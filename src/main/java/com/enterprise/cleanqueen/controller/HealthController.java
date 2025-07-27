@@ -51,7 +51,7 @@ public class HealthController {
        )
    })
    @GetMapping
-   public ResponseEntity<Map<String, Object>> health() {
+   public ResponseEntity<?> health() {
        try {
            Map<String, Object> health = new HashMap<>();
            health.put("status", "UP");
@@ -104,7 +104,7 @@ public class HealthController {
        )
    })
    @GetMapping("/db")
-   public ResponseEntity<Map<String, Object>> databaseHealth() {
+   public ResponseEntity<?> databaseHealth() {
        try (Connection connection = dataSource.getConnection()) {
            Map<String, Object> dbHealth = new HashMap<>();
            dbHealth.put("database", "UP");

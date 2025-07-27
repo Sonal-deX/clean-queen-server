@@ -101,14 +101,19 @@ public class ReviewController {
     })
     @PostMapping
     @PreAuthorize("hasRole('SUPERVISOR')")
-    public ResponseEntity<CreateReviewResponse> createReview(
+    public ResponseEntity<?> createReview(
             @Parameter(description = "Task review details", required = true)
             @Valid @RequestBody CreateReviewRequest request,
             Authentication authentication) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        CreateReviewResponse response = reviewService.createReview(request, userDetails.getUsername());
-        logger.info("Review created for task: {} with rating: {}", response.getTaskId(), response.getRating());
-        return ResponseEntity.ok(response);
+        try {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            CreateReviewResponse response = reviewService.createReview(request, userDetails.getUsername());
+            logger.info("Review created for task: {} with rating: {}", response.getTaskId(), response.getRating());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error creating review for task: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
     }
 }

@@ -8,6 +8,7 @@ import com.enterprise.cleanqueen.enums.TaskStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "Task update with optional subtasks")
 public class TaskUpdateRequest {
@@ -16,6 +17,7 @@ public class TaskUpdateRequest {
     private String id; // null for new tasks, existing ID for updates
 
     @Schema(description = "Task name", example = "Updated Clean Office Floor", required = true)
+    @NotBlank(message = "Task name is required")
     private String name;
 
     @Schema(description = "Task description", example = "Updated deep clean and mop entire office floor area")
