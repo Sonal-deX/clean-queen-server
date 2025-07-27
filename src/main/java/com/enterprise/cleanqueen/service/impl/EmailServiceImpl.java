@@ -40,13 +40,13 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendTemporaryPasswordEmail(String toEmail, String temporaryPassword) {
+    public void sendSupervisorPasswordEmail(String toEmail, String temporaryPassword) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(toEmail);
             message.setSubject("Clean Queen - Supervisor Account Created");
-            message.setText(buildTemporaryPasswordEmailContent(temporaryPassword));
+            message.setText(buildSupervisorPasswordEmailContent(temporaryPassword));
 
             mailSender.send(message);
             logger.info("Temporary password email sent successfully to: {}", toEmail);
@@ -56,22 +56,7 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    @Override
-    public void sendProjectCodeEmail(String toEmail, String projectCode, String projectName) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject("Clean Queen - Project Assignment Code");
-            message.setText(buildProjectCodeEmailContent(projectCode, projectName));
-
-            mailSender.send(message);
-            logger.info("Project code email sent successfully to: {}", toEmail);
-        } catch (MailException e) {
-            logger.error("Failed to send project code email to: {}", toEmail, e);
-            throw new RuntimeException("Failed to send project code email", e);
-        }
-    }
+   
 
     private String buildOtpEmailContent(String otp) {
         return String.format("""
@@ -91,7 +76,7 @@ public class EmailServiceImpl implements EmailService {
         );
     }
 
-    private String buildTemporaryPasswordEmailContent(String temporaryPassword) {
+    private String buildSupervisorPasswordEmailContent(String temporaryPassword) {
         return String.format("""
                              Dear Supervisor,
                              
@@ -99,7 +84,7 @@ public class EmailServiceImpl implements EmailService {
                              
                              Your supervisor account has been created. Here are your login credentials:
                              
-                             Temporary Password: %s
+                             Password: %s
                              
                              Please log in and change your password immediately for security purposes.
                              
@@ -108,22 +93,6 @@ public class EmailServiceImpl implements EmailService {
                              Best regards,
                              Clean Queen Admin Team""",
                 temporaryPassword
-        );
-    }
-
-    private String buildProjectCodeEmailContent(String projectCode, String projectName) {
-        return String.format("""
-                             Dear Customer,
-                             
-                             Your cleaning project '%s' has been created and is ready for assignment.
-                             
-                             Project Code: %s
-                             
-                             Please use this code to assign yourself to the project through our system.
-                             
-                             Best regards,
-                             Clean Queen Team""",
-                projectName, projectCode
         );
     }
 }

@@ -61,10 +61,10 @@ public class AdminServiceImpl implements AdminService {
         
         // Save supervisor
         userRepository.save(supervisor);
-        
-        // Send temporary password email
-        emailService.sendTemporaryPasswordEmail(request.getEmail(), temporaryPassword);
-        
+
+        // Send supervisor password email
+        emailService.sendSupervisorPasswordEmail(request.getEmail(), temporaryPassword);
+
         logger.info("Supervisor created successfully: {}", supervisor.getEmail());
         
         return new CreateSupervisorResponse(
