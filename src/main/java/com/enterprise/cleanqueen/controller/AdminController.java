@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.enterprise.cleanqueen.dto.admin.CreateSupervisorRequest;
 import com.enterprise.cleanqueen.dto.admin.CreateSupervisorResponse;
+import com.enterprise.cleanqueen.dto.admin.SendProjectCodeRequest;
+import com.enterprise.cleanqueen.dto.admin.SendProjectCodeResponse;
 import com.enterprise.cleanqueen.dto.common.ErrorResponse;
 import com.enterprise.cleanqueen.service.AdminService;
 
@@ -28,14 +30,13 @@ import jakarta.validation.Valid;
 @Tag(name = "🔐 Admin Management", description = "Admin-only endpoints for system management")
 @SecurityRequirement(name = "JWT Authentication")
 public class AdminController {
-    
-    
+
     @Autowired
     private AdminService adminService;
-    
+
     @Operation(
-        summary = "Create Supervisor Account",
-        description = """
+            summary = "Create Supervisor Account",
+            description = """
         **Create a new supervisor account with temporary password.**
         
         **Admin Only Access:**
@@ -48,32 +49,32 @@ public class AdminController {
         3. Email sent to supervisor with login credentials
         4. Supervisor must change password on first login
         """,
-        tags = {"Admin Management"}
+            tags = {"Admin Management"}
     )
     @ApiResponses(value = {
         @ApiResponse(
-            responseCode = "200",
-            description = "✅ Supervisor created successfully",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = CreateSupervisorResponse.class)
-            )
+                responseCode = "200",
+                description = "✅ Supervisor created successfully",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = CreateSupervisorResponse.class)
+                )
         ),
         @ApiResponse(
-            responseCode = "400",
-            description = "❌ Creation failed - validation errors or email already exists",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponse.class)
-            )
+                responseCode = "400",
+                description = "❌ Creation failed - validation errors or email already exists",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class)
+                )
         ),
         @ApiResponse(
-            responseCode = "403",
-            description = "❌ Access denied - Admin role required",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponse.class)
-            )
+                responseCode = "403",
+                description = "❌ Access denied - Admin role required",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class)
+                )
         )
     })
     @PostMapping("/supervisors")
@@ -84,9 +85,54 @@ public class AdminController {
         try {
             CreateSupervisorResponse response = adminService.createSupervisor(request);
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
+    }
+
+    @Operation(
+            summary = "Send Project Code to Customer",
+            description = """
+    **Send project assignment code to customer via email.**
+    
+    **Admin Only Access:**
+    - Validates project code exists
+    - Sends professional email with project details
+    - Customer can use code for self-assignment
+    
+    **Email Contents:**
+    - Project code for assignment
+    - Project name and basic details
+    - Instructions for self-assignment
+    """,
+            tags = {"Admin Management"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+                responseCode = "200",
+                description = "✅ Project code sent successfully",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = SendProjectCodeResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "400",
+                description = "❌ Send failed - Invalid project code or email",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class)
+                )
+        )
+    })
+    @PostMapping("/send-project-code")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SendProjectCodeResponse> sendProjectCode(
+            @Parameter(description = "Project code email details", required = true)
+            @Valid @RequestBody SendProjectCodeRequest request) {
+
+        SendProjectCodeResponse response = adminService.sendProjectCode(request);
+        return ResponseEntity.ok(response);
     }
 }

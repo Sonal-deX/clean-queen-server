@@ -73,6 +73,23 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Override
+    public void sendProjectCodeEmail(String toEmail, String projectCode, String projectName) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject("Clean Queen - Project Assignment Code");
+            message.setText(buildProjectCodeEmailContent(projectCode, projectName));
+
+            mailSender.send(message);
+            logger.info("Project code email sent successfully to: {}", toEmail);
+        } catch (Exception e) {
+            logger.error("Failed to send project code email to: {}", toEmail, e);
+            throw new RuntimeException("Failed to send project code email", e);
+        }
+    }
+
     private String buildOtpEmailContent(String otp) {
         return String.format("""
                              Dear User,
@@ -124,6 +141,24 @@ public class EmailServiceImpl implements EmailService {
                 + "Best regards,\n"
                 + "Clean Queen Customer Service Team",
                 customerName, requestId
+        );
+    }
+
+    private String buildProjectCodeEmailContent(String projectCode, String projectName) {
+        return String.format(
+                "Dear Customer,\n\n"
+                + "Your cleaning project has been created and is ready for assignment.\n\n"
+                + "Project Details:\n"
+                + "Project Name: %s\n"
+                + "Project Code: %s\n\n"
+                + "To assign yourself to this project:\n"
+                + "1. Login to the Clean Queen system\n"
+                + "2. Use the project assignment feature\n"
+                + "3. Enter the project code above\n\n"
+                + "Once assigned, you'll be able to track project progress and communicate with our team.\n\n"
+                + "Best regards,\n"
+                + "Clean Queen Project Team",
+                projectName, projectCode
         );
     }
 }

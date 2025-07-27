@@ -7,5 +7,7 @@ public interface EmailService {
     void sendSupervisorPasswordEmail(String toEmail, String temporaryPassword);
     
     void sendRequestConfirmationEmail(String toEmail, String requestId, String customerName);
-    
+
+    void sendProjectCodeEmail(String toEmail, String projectCode, String projectName);
+
 }
