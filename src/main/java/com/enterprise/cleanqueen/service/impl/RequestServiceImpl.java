@@ -13,8 +13,10 @@ import com.enterprise.cleanqueen.entity.User;
 import com.enterprise.cleanqueen.enums.CleaningRequestStatus;
 import com.enterprise.cleanqueen.repository.CleaningRequestRepository;
 import com.enterprise.cleanqueen.repository.UserRepository;
+import com.enterprise.cleanqueen.service.EmailService;
 import com.enterprise.cleanqueen.service.RequestService;
 import com.enterprise.cleanqueen.util.CodeGenerator;
+
 
 @Service
 @Transactional
@@ -30,6 +32,9 @@ public class RequestServiceImpl implements RequestService {
 
     @Autowired
     private CodeGenerator codeGenerator;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public CreateRequestResponse createRequest(CreateRequestRequest request, String userEmail) {
@@ -50,6 +55,13 @@ public class RequestServiceImpl implements RequestService {
         // Save request
         requestRepository.save(cleaningRequest);
 
+        // Send confirmation email to customer
+        emailService.sendRequestConfirmationEmail(
+                user.getEmail(),
+                cleaningRequest.getId(),
+                request.getName()
+        );
+
         logger.info("Cleaning request created successfully: {}", cleaningRequest.getId());
 
         return new CreateRequestResponse(
@@ -59,4 +71,5 @@ public class RequestServiceImpl implements RequestService {
                 cleaningRequest.getStatus().name()
         );
     }
+
 }

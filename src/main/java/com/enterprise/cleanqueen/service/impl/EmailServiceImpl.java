@@ -56,7 +56,22 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-   
+    @Override
+    public void sendRequestConfirmationEmail(String toEmail, String requestId, String customerName) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject("Clean Queen - Request Submitted Successfully");
+            message.setText(buildRequestConfirmationEmailContent(requestId, customerName));
+
+            mailSender.send(message);
+            logger.info("Request confirmation email sent to: {}", toEmail);
+        } catch (Exception e) {
+            logger.error("Failed to send request confirmation email to: {}", toEmail, e);
+            throw new RuntimeException("Failed to send confirmation email", e);
+        }
+    }
 
     private String buildOtpEmailContent(String otp) {
         return String.format("""
@@ -93,6 +108,22 @@ public class EmailServiceImpl implements EmailService {
                              Best regards,
                              Clean Queen Admin Team""",
                 temporaryPassword
+        );
+    }
+
+    private String buildRequestConfirmationEmailContent(String requestId, String customerName) {
+        return String.format(
+                "Dear %s,\n\n"
+                + "Thank you for choosing Clean Queen services!\n\n"
+                + "Your cleaning request has been submitted successfully.\n\n"
+                + "Request Details:\n"
+                + "Request ID: %s\n"
+                + "Status: Pending Review\n\n"
+                + "Our team will review your request and contact you within 24 hours to discuss the details and schedule your cleaning service.\n\n"
+                + "For any questions, please contact us or reference your Request ID.\n\n"
+                + "Best regards,\n"
+                + "Clean Queen Customer Service Team",
+                customerName, requestId
         );
     }
 }
