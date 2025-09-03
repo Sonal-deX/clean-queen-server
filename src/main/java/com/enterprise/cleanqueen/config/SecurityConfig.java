@@ -21,7 +21,8 @@ public class SecurityConfig {
                 .requestMatchers("/health/**").permitAll() // Allow health endpoints
                 .requestMatchers("/auth/**").permitAll() // Allow authentication endpoints
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Allow Swagger
-                .requestMatchers("/docs.html").permitAll() // Add this line
+                .requestMatchers("/docs.html", "/docs/**").permitAll() // Allow Scalar API docs
+                .requestMatchers("/actuator/**").permitAll() // Allow actuator endpoints
 
                 // Admin only endpoints
                 .requestMatchers("/admin/**").hasRole("ADMIN")
