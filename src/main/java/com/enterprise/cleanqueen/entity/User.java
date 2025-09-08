@@ -27,9 +27,13 @@ public class User {
     @Column(name = "id", length = 6, nullable = false)
     private String id;
     
-    @NotBlank(message = "Username is required")
-    @Column(name = "username", unique = true, nullable = false)
-    private String username;
+    @NotBlank(message = "First name is required")
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+    
+    @NotBlank(message = "Last name is required")
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
     
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
@@ -65,9 +69,10 @@ public class User {
     // Constructors
     public User() {}
     
-    public User(String id, String username, String email, String password, String phoneNumber, Role role) {
+    public User(String id, String firstName, String lastName, String email, String password, String phoneNumber, Role role) {
         this.id = id;
-        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;  
@@ -80,8 +85,11 @@ public class User {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
     
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

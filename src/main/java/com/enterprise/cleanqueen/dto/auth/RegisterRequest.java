@@ -14,10 +14,14 @@ import jakarta.validation.constraints.Size;
 @JsonIgnoreProperties(ignoreUnknown = false) // Strict: reject unknown properties
 public class RegisterRequest {
     
-    @Schema(description = "Username for the account", example = "john_doe", required = true)
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    private String username;
+    @Schema(description = "User's first name", example = "John", required = true)
+    @NotBlank(message = "First name is required")
+    @Size(min = 1, max = 50, message = "First name must be between 1 and 50 characters")
+    private String firstName;
+    
+    @Schema(description = "User's last name", example = "Doe", required = false)
+    @Size(max = 50, message = "Last name must be maximum 50 characters")
+    private String lastName;
     
     @Schema(description = "User's email address", example = "user@example.com", required = true)
     @NotBlank(message = "Email is required")
@@ -39,8 +43,9 @@ public class RegisterRequest {
     // Constructors
     public RegisterRequest() {}
     
-    public RegisterRequest(String username, String email, String password, String phoneNumber, Role role) {
-        this.username = username;
+    public RegisterRequest(String firstName, String lastName, String email, String password, String phoneNumber, Role role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
@@ -48,8 +53,11 @@ public class RegisterRequest {
     }
 
     // Getters and Setters
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

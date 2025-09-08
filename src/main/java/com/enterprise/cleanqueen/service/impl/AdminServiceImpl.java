@@ -48,17 +48,14 @@ public class AdminServiceImpl implements AdminService {
             throw new RuntimeException("Email is already registered");
         }
 
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username is already taken");
-        }
-
         // Generate temporary password
         String temporaryPassword = codeGenerator.generateTemporaryPassword();
 
         // Create supervisor user
         User supervisor = new User();
         supervisor.setId(codeGenerator.generateUserId());
-        supervisor.setUsername(request.getUsername());
+        supervisor.setFirstName(request.getFirstName());
+        supervisor.setLastName(request.getLastName());
         supervisor.setEmail(request.getEmail());
         supervisor.setPassword(passwordEncoder.encode(temporaryPassword));
         supervisor.setPhoneNumber(request.getPhoneNumber());
@@ -79,7 +76,8 @@ public class AdminServiceImpl implements AdminService {
                 "Supervisor account created successfully. Temporary password sent to email.",
                 supervisor.getId(),
                 supervisor.getEmail(),
-                supervisor.getUsername()
+                supervisor.getFirstName(),
+                supervisor.getLastName()
         );
     }
 

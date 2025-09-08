@@ -78,9 +78,11 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException("Invalid email format");
         }
 
-        if (!validationUtil.isValidUsername(request.getUsername())) {
-            throw new BusinessException("Username must be 3-50 characters and contain only letters, numbers, dots, hyphens, and underscores");
+        if (request.getFirstName() == null || request.getFirstName().trim().isEmpty()) {
+            throw new BusinessException("First name is required");
         }
+
+        // lastName is optional - no validation needed
 
         if (!validationUtil.isValidPassword(request.getPassword())) {
             throw new BusinessException("Password must be 6-100 characters long");
@@ -92,7 +94,9 @@ public class AuthServiceImpl implements AuthService {
 
         // Sanitize inputs for security
         String cleanEmail = validationUtil.sanitizeInput(request.getEmail()).toLowerCase();
-        String cleanUsername = validationUtil.sanitizeInput(request.getUsername());
+        String cleanFirstName = validationUtil.sanitizeInput(request.getFirstName());
+        String cleanLastName = request.getLastName() != null && !request.getLastName().trim().isEmpty() ? 
+            validationUtil.sanitizeInput(request.getLastName()) : null;
         String cleanPhoneNumber = request.getPhoneNumber() != null ? 
             validationUtil.sanitizeInput(request.getPhoneNumber()) : null;
 
@@ -121,10 +125,6 @@ public class AuthServiceImpl implements AuthService {
             userRepository.delete(existingUser);
         }
 
-        if (userRepository.existsByUsername(cleanUsername)) {
-            throw new BusinessException("Username is already taken");
-        }
-
         // Only allow CUSTOMER and ADMIN registration (SUPERVISOR created by admin only)
         if (request.getRole() == Role.SUPERVISOR) {
             throw new BusinessException("Supervisors can only be created by admin");
@@ -133,7 +133,8 @@ public class AuthServiceImpl implements AuthService {
         // Create user entity
         User user = new User();
         user.setId(codeGenerator.generateUserId());
-        user.setUsername(cleanUsername);
+        user.setFirstName(cleanFirstName);
+        user.setLastName(cleanLastName);
         user.setEmail(cleanEmail);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhoneNumber(cleanPhoneNumber);
@@ -187,7 +188,8 @@ public class AuthServiceImpl implements AuthService {
                 token,
                 refreshToken,
                 user.getId(),
-                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
                 user.getEmail(),
                 user.getRole(),
                 jwtService.getJwtExpiration()
@@ -229,7 +231,8 @@ public class AuthServiceImpl implements AuthService {
                 token,
                 refreshToken,
                 user.getId(),
-                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
                 user.getEmail(),
                 user.getRole(),
                 jwtService.getJwtExpiration()

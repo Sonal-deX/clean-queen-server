@@ -87,7 +87,8 @@ public class UserController {
         - Users can only update their own profile
         
         **Updatable Fields:**
-        - Username (must be unique)
+        - First name
+        - Last name (optional)
         - Phone number
         - Password (requires current password)
         """,
@@ -117,10 +118,12 @@ public class UserController {
             @Valid @RequestBody UpdateProfileRequest request,
             Authentication authentication) {
         
-        // Validate username format if provided
-        if (request.getUsername() != null && !validationUtil.isValidUsername(request.getUsername())) {
-            throw new RuntimeException("Username must be 3-50 characters and contain only letters, numbers, dots, hyphens, and underscores");
+        // Validate first name format if provided
+        if (request.getFirstName() != null && request.getFirstName().trim().isEmpty()) {
+            throw new RuntimeException("First name cannot be empty");
         }
+        
+        // lastName is optional - no validation needed
         
         // Validate phone number format if provided
         if (request.getPhoneNumber() != null && !validationUtil.isValidPhoneNumber(request.getPhoneNumber())) {

@@ -1,17 +1,18 @@
 package com.enterprise.cleanqueen.service.impl;
 
-import com.enterprise.cleanqueen.dto.user.UpdateProfileRequest;
-import com.enterprise.cleanqueen.dto.user.UpdateProfileResponse;
-import com.enterprise.cleanqueen.dto.user.UserProfileResponse;
-import com.enterprise.cleanqueen.entity.User;
-import com.enterprise.cleanqueen.repository.UserRepository;
-import com.enterprise.cleanqueen.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.enterprise.cleanqueen.dto.user.UpdateProfileRequest;
+import com.enterprise.cleanqueen.dto.user.UpdateProfileResponse;
+import com.enterprise.cleanqueen.dto.user.UserProfileResponse;
+import com.enterprise.cleanqueen.entity.User;
+import com.enterprise.cleanqueen.repository.UserRepository;
+import com.enterprise.cleanqueen.service.UserService;
 
 @Service
 @Transactional
@@ -32,7 +33,8 @@ public class UserServiceImpl implements UserService {
         
         return new UserProfileResponse(
             user.getId(),
-            user.getUsername(),
+            user.getFirstName(),
+            user.getLastName(),
             user.getEmail(),
             user.getPhoneNumber(),
             user.getRole(),
@@ -49,16 +51,16 @@ public class UserServiceImpl implements UserService {
         
         boolean hasChanges = false;
         
-        // Update username if provided
-        if (request.getUsername() != null && !request.getUsername().trim().isEmpty()) {
-            if (!request.getUsername().equals(user.getUsername())) {
-                // Check if username is already taken by another user
-                if (userRepository.existsByUsername(request.getUsername())) {
-                    throw new RuntimeException("Username is already taken");
-                }
-                user.setUsername(request.getUsername());
-                hasChanges = true;
-            }
+        // Update first name if provided
+        if (request.getFirstName() != null && !request.getFirstName().trim().isEmpty()) {
+            user.setFirstName(request.getFirstName());
+            hasChanges = true;
+        }
+        
+        // Update last name if provided (can be empty to clear it)
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName().trim().isEmpty() ? null : request.getLastName());
+            hasChanges = true;
         }
         
         // Update phone number if provided
@@ -94,7 +96,8 @@ public class UserServiceImpl implements UserService {
         return new UpdateProfileResponse(
             true,
             "Profile updated successfully",
-            user.getUsername(),
+            user.getFirstName(),
+            user.getLastName(),
             user.getPhoneNumber()
         );
     }
