@@ -110,6 +110,14 @@ public class UserController {
                 mediaType = "application/json",
                 schema = @Schema(implementation = ApiErrorResponse.class)
             )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "❌ Unauthorized - Invalid or missing authentication token",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiErrorResponse.class)
+            )
         )
     })
     @PutMapping("/profile")

@@ -11,16 +11,16 @@ public class ApiErrorResponse {
     @Schema(description = "Indicates if the operation was successful", example = "false")
     private boolean success;
     
-    @Schema(description = "Error message describing what went wrong", example = "Email is already registered")
+    @Schema(description = "Error message describing what went wrong", example = "Access denied. Insufficient privileges.")
     private String message;
     
-    @Schema(description = "HTTP status code", example = "400")
+    @Schema(description = "HTTP status code", example = "403")
     private int statusCode;
     
     @Schema(description = "Timestamp when the error occurred")
     private LocalDateTime timestamp;
     
-    @Schema(description = "Request path where error occurred", example = "/api/auth/register")
+    @Schema(description = "Request path where error occurred", example = "/api/projects")
     private String path;
     
     @Schema(description = "Detailed validation errors (if applicable)")

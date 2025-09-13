@@ -91,6 +91,14 @@ public class ReviewController {
                 )
         ),
         @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
                 responseCode = "403",
                 description = "❌ Access denied - Supervisor not assigned to this project",
                 content = @Content(

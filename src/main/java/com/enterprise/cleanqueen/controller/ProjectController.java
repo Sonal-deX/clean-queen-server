@@ -79,6 +79,14 @@ public class ProjectController {
                 )
         ),
         @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
                 responseCode = "403",
                 description = "❌ Access denied - Admin role required",
                 content = @Content(
@@ -131,6 +139,22 @@ public class ProjectController {
                 content = @Content(
                         mediaType = "application/json",
                         schema = @Schema(implementation = ProjectUpdateResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "403",
+                description = "❌ Access denied - Admin role required",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
                 )
         ),
         @ApiResponse(

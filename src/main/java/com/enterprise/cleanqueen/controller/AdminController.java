@@ -69,6 +69,14 @@ public class AdminController {
                 )
         ),
         @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
                 responseCode = "403",
                 description = "❌ Access denied - Admin role required",
                 content = @Content(
@@ -115,6 +123,22 @@ public class AdminController {
         @ApiResponse(
                 responseCode = "400",
                 description = "❌ Send failed - Invalid project code or email",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "403",
+                description = "❌ Access denied - Admin role required",
                 content = @Content(
                         mediaType = "application/json",
                         schema = @Schema(implementation = ApiErrorResponse.class)

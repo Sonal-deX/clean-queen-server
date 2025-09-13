@@ -80,6 +80,22 @@ public class AssignmentController {
                         mediaType = "application/json",
                         schema = @Schema(implementation = ApiErrorResponse.class)
                 )
+        ),
+        @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "403",
+                description = "❌ Access denied - Customer role required",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
         )
     })
     @PostMapping("/customer")
@@ -134,6 +150,22 @@ public class AssignmentController {
                         mediaType = "application/json",
                         schema = @Schema(implementation = ApiErrorResponse.class)
                 )
+        ),
+        @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "403",
+                description = "❌ Access denied - Supervisor role required",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
         )
     })
     @PostMapping("/supervisor")
@@ -184,6 +216,22 @@ public class AssignmentController {
         @ApiResponse(
                 responseCode = "400",
                 description = "❌ Exit failed - Not assigned to project or invalid project",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "403",
+                description = "❌ Access denied - Supervisor role required",
                 content = @Content(
                         mediaType = "application/json",
                         schema = @Schema(implementation = ApiErrorResponse.class)
