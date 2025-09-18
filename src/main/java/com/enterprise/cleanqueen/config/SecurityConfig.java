@@ -79,8 +79,8 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Allow Swagger
                 .requestMatchers("/docs.html", "/docs/**").permitAll() // Allow Scalar API docs
                 .requestMatchers("/actuator/**").permitAll() // Allow actuator endpoints
-                .requestMatchers(HttpMethod.GET, "/projects/user/**").permitAll() // Allow public access to get projects by user
-                .requestMatchers(HttpMethod.GET, "/projects/*/tasks").permitAll() // Allow public access to get project tasks
+                .requestMatchers(HttpMethod.GET, "/projects/user/**").authenticated() // Require authentication for get projects by user
+                .requestMatchers(HttpMethod.GET, "/projects/*/tasks").authenticated() // Require authentication for get project tasks
 
                 // Admin only endpoints
                 .requestMatchers("/admin/**").hasRole("ADMIN")

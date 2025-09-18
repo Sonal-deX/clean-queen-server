@@ -187,9 +187,9 @@ public class ProjectController {
             description = """
         **Retrieve all projects assigned to a specific user.**
         
-        **Public Access:**
-        - No authentication required
-        - Returns projects for any valid user ID
+        **Authentication Required:**
+        - Valid JWT token required
+        - Accessible by: Customer, Supervisor, Admin roles
         
         **Returns:**
         - List of projects assigned to the user
@@ -199,7 +199,7 @@ public class ProjectController {
         **Use Cases:**
         - Customer viewing their assigned projects
         - Supervisor checking their managed projects
-        - Public monitoring of project assignments
+        - Admin monitoring user workload
         """,
             tags = {"Project Management"}
     )
@@ -213,6 +213,14 @@ public class ProjectController {
                 )
         ),
         @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
                 responseCode = "404",
                 description = "❌ User not found",
                 content = @Content(
@@ -222,7 +230,7 @@ public class ProjectController {
         )
     })
     @GetMapping("/user/{userId}")
-    @SecurityRequirement(name = "")
+    @SecurityRequirement(name = "JWT Authentication")
     public ResponseEntity<?> getProjectsByUserId(
             @Parameter(description = "User ID to get projects for", required = true, example = "USER123")
             @PathVariable String userId) {
@@ -237,9 +245,9 @@ public class ProjectController {
             description = """
         **Retrieve complete task hierarchy for a specific project.**
         
-        **Public Access:**
-        - No authentication required
-        - Returns task hierarchy for any valid project ID
+        **Authentication Required:**
+        - Valid JWT token required
+        - Accessible by: Customer, Supervisor, Admin roles
         
         **Returns:**
         - Project details and metadata
@@ -254,7 +262,7 @@ public class ProjectController {
         - Includes task information for each level
         
         **Use Cases:**
-        - Public viewing of project structure and progress
+        - Authenticated viewing of project structure and progress
         - Understanding task dependencies
         - Tracking completion status at all levels
         - Project management and oversight
@@ -271,6 +279,14 @@ public class ProjectController {
                 )
         ),
         @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
                 responseCode = "404",
                 description = "❌ Project not found",
                 content = @Content(
@@ -280,7 +296,7 @@ public class ProjectController {
         )
     })
     @GetMapping("/{projectId}/tasks")
-    @SecurityRequirement(name = "")
+    @SecurityRequirement(name = "JWT Authentication")
     public ResponseEntity<?> getProjectTaskHierarchy(
             @Parameter(description = "Project ID to get task hierarchy for", required = true, example = "ABC123")
             @PathVariable String projectId) {
