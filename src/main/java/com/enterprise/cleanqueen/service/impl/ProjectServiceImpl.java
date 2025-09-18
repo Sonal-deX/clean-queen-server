@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.enterprise.cleanqueen.dto.project.ProjectCreateRequest;
 import com.enterprise.cleanqueen.dto.project.ProjectCreateResponse;
+import com.enterprise.cleanqueen.dto.project.ProjectListResponse;
+import com.enterprise.cleanqueen.dto.project.ProjectTaskHierarchyResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectUpdateRequest;
 import com.enterprise.cleanqueen.dto.project.ProjectUpdateResponse;
 import com.enterprise.cleanqueen.dto.project.TaskCreateRequest;
@@ -209,5 +211,127 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return taskCount;
+    }
+
+    @Override
+    public ProjectListResponse getProjectsByUserId(String userId) {
+        try {
+            // Find projects where user is either customer or supervisor
+            List<Project> customerProjects = projectRepository.findByCustomerId(userId);
+            List<Project> supervisorProjects = projectRepository.findBySupervisorId(userId);
+            
+            // Combine both lists and remove duplicates
+            Set<Project> allProjects = new HashSet<>();
+            allProjects.addAll(customerProjects);
+            allProjects.addAll(supervisorProjects);
+            
+            // Convert to ProjectSummary list
+            List<ProjectListResponse.ProjectSummary> projectSummaries = allProjects.stream()
+                .map(this::convertToProjectSummary)
+                .collect(Collectors.toList());
+            
+            String message = String.format("Retrieved %d projects for user %s", projectSummaries.size(), userId);
+            logger.info(message);
+            
+            return new ProjectListResponse(true, message, projectSummaries);
+            
+        } catch (Exception e) {
+            logger.error("Error retrieving projects for user {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Failed to retrieve projects for user: " + userId, e);
+        }
+    }
+
+    @Override
+    public ProjectTaskHierarchyResponse getProjectTaskHierarchy(String projectId) {
+        try {
+            // Find the project
+            Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
+            
+            // Get all root tasks (tasks with no parent)
+            List<Task> rootTasks = taskRepository.findByProjectIdAndParentIdIsNull(projectId);
+            
+            // Build task hierarchy
+            List<ProjectTaskHierarchyResponse.TaskHierarchy> taskHierarchies = rootTasks.stream()
+                .map(this::buildTaskHierarchy)
+                .collect(Collectors.toList());
+            
+            // Calculate task statistics
+            List<Task> allTasks = taskRepository.findByProjectId(projectId);
+            int totalTasks = allTasks.size();
+            int completedTasks = (int) allTasks.stream()
+                .filter(task -> task.getStatus() == TaskStatus.COMPLETED)
+                .count();
+            
+            // Create project details
+            ProjectTaskHierarchyResponse.ProjectDetails projectDetails = new ProjectTaskHierarchyResponse.ProjectDetails(
+                project.getId(),
+                project.getProjectCode(),
+                project.getName(),
+                project.getDescription(),
+                project.getStatus(),
+                taskHierarchies,
+                totalTasks,
+                completedTasks,
+                project.getCreatedAt(),
+                project.getUpdatedAt()
+            );
+            
+            String message = String.format("Retrieved task hierarchy for project %s with %d total tasks", 
+                                         projectId, totalTasks);
+            logger.info(message);
+            
+            return new ProjectTaskHierarchyResponse(true, message, projectDetails);
+            
+        } catch (Exception e) {
+            logger.error("Error retrieving task hierarchy for project {}: {}", projectId, e.getMessage());
+            throw new RuntimeException("Failed to retrieve task hierarchy for project: " + projectId, e);
+        }
+    }
+    
+    private ProjectListResponse.ProjectSummary convertToProjectSummary(Project project) {
+        // Get task statistics
+        List<Task> projectTasks = taskRepository.findByProjectId(project.getId());
+        int totalTasks = projectTasks.size();
+        int completedTasks = (int) projectTasks.stream()
+            .filter(task -> task.getStatus() == TaskStatus.COMPLETED)
+            .count();
+        
+        return new ProjectListResponse.ProjectSummary(
+            project.getId(),
+            project.getProjectCode(),
+            project.getName(),
+            project.getDescription(),
+            project.getStatus(),
+            totalTasks,
+            completedTasks,
+            project.getCreatedAt(),
+            project.getUpdatedAt()
+        );
+    }
+    
+    private ProjectTaskHierarchyResponse.TaskHierarchy buildTaskHierarchy(Task task) {
+        // Get subtasks
+        List<Task> subtasks = taskRepository.findByParentId(task.getId());
+        List<ProjectTaskHierarchyResponse.TaskHierarchy> subtaskHierarchies = subtasks.stream()
+            .map(this::buildTaskHierarchy)
+            .collect(Collectors.toList());
+        
+        // Since tasks don't have assignment info in the current entity, 
+        // we'll set these to null for now
+        return new ProjectTaskHierarchyResponse.TaskHierarchy(
+            task.getId(),
+            task.getName(),
+            task.getDescription(),
+            task.getStatus(),
+            task.getPriority(),
+            null, // estimatedHours - not in entity
+            null, // assignedUserId - not in entity
+            null, // assignedUserName - not in entity
+            task.getDueDate() != null ? task.getDueDate().atStartOfDay() : null, // Convert LocalDate to LocalDateTime
+            task.getCreatedAt(),
+            task.getUpdatedAt(),
+            subtaskHierarchies
+        );
     }
 }

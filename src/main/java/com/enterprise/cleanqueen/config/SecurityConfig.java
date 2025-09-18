@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -78,6 +79,8 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Allow Swagger
                 .requestMatchers("/docs.html", "/docs/**").permitAll() // Allow Scalar API docs
                 .requestMatchers("/actuator/**").permitAll() // Allow actuator endpoints
+                .requestMatchers(HttpMethod.GET, "/projects/user/**").permitAll() // Allow public access to get projects by user
+                .requestMatchers(HttpMethod.GET, "/projects/*/tasks").permitAll() // Allow public access to get project tasks
 
                 // Admin only endpoints
                 .requestMatchers("/admin/**").hasRole("ADMIN")
