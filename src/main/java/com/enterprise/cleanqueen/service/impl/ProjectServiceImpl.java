@@ -60,6 +60,9 @@ public class ProjectServiceImpl implements ProjectService {
         project.setName(request.getName());
         project.setDescription(request.getDescription());
         project.setProjectCode(projectCode);
+        project.setDueDate(request.getDueDate());
+        project.setAddress(request.getAddress());
+        project.setNoOfCleaners(request.getNoOfCleaners());
         project.setStatus(ProjectStatus.PENDING_ASSIGNMENT);
 
         // Save project first
@@ -91,6 +94,15 @@ public class ProjectServiceImpl implements ProjectService {
         project.setDescription(request.getDescription());
         if (request.getStatus() != null) {
             project.setStatus(request.getStatus());
+        }
+        if (request.getDueDate() != null) {
+            project.setDueDate(request.getDueDate());
+        }
+        if (request.getAddress() != null) {
+            project.setAddress(request.getAddress());
+        }
+        if (request.getNoOfCleaners() != null) {
+            project.setNoOfCleaners(request.getNoOfCleaners());
         }
 
         projectRepository.save(project);
@@ -163,7 +175,6 @@ public class ProjectServiceImpl implements ProjectService {
             task.setDescription(taskRequest.getDescription());
             task.setStatus(taskRequest.getStatus() != null ? taskRequest.getStatus() : TaskStatus.PENDING);
             task.setPriority(taskRequest.getPriority() != null ? taskRequest.getPriority() : TaskPriority.MEDIUM);
-            task.setDueDate(taskRequest.getDueDate());
             task.setProjectId(projectId);
             task.setParentId(parentTaskId);
 
@@ -193,7 +204,6 @@ public class ProjectServiceImpl implements ProjectService {
             task.setDescription(taskRequest.getDescription());
             task.setStatus(TaskStatus.PENDING);
             task.setPriority(taskRequest.getPriority() != null ? taskRequest.getPriority() : com.enterprise.cleanqueen.enums.TaskPriority.MEDIUM);
-            task.setDueDate(taskRequest.getDueDate());
             task.setProjectId(projectId);
             task.setParentId(parentTaskId);
 
@@ -305,6 +315,7 @@ public class ProjectServiceImpl implements ProjectService {
             project.getStatus(),
             totalTasks,
             completedTasks,
+            project.getAverageRating(),
             project.getCreatedAt(),
             project.getUpdatedAt()
         );
@@ -328,7 +339,8 @@ public class ProjectServiceImpl implements ProjectService {
             null, // estimatedHours - not in entity
             null, // assignedUserId - not in entity
             null, // assignedUserName - not in entity
-            task.getDueDate() != null ? task.getDueDate().atStartOfDay() : null, // Convert LocalDate to LocalDateTime
+            null, // dueDate - removed from tasks, only projects have due dates
+            task.getAverageRating(), // averageRating - now included
             task.getCreatedAt(),
             task.getUpdatedAt(),
             subtaskHierarchies

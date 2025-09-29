@@ -5,5 +5,5 @@ import com.enterprise.cleanqueen.dto.review.CreateReviewResponse;
 
 public interface ReviewService {
 
-    CreateReviewResponse createReview(CreateReviewRequest request, String supervisorEmail);
+    CreateReviewResponse createReview(CreateReviewRequest request, String customerEmail);
 }

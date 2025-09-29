@@ -43,8 +43,8 @@ public class ReviewController {
             description = """
         **Create a review for a completed leaf task with intelligent rating propagation.**
         
-        **Supervisor Only Access:**
-        - Only supervisors assigned to the project can create reviews
+        **Customer Only Access:**
+        - Only customers who own the project can create reviews
         - Reviews can only be created for "leaf tasks" (tasks with no subtasks)
         - One review per task (one-to-one relationship)
         
@@ -67,8 +67,8 @@ public class ReviewController {
         
         **Business Rules:**
         - Only leaf tasks (no children) can be reviewed
-        - Supervisor must be assigned to the project
-        - Task must belong to supervisor's assigned project
+        - Customer must own the project
+        - Task must belong to customer's project
         - Automatic rating calculation and propagation
         """,
             tags = {"Task Reviews"}
@@ -100,7 +100,7 @@ public class ReviewController {
         ),
         @ApiResponse(
                 responseCode = "403",
-                description = "❌ Access denied - Supervisor not assigned to this project",
+                description = "❌ Access denied - Customer does not own this project",
                 content = @Content(
                         mediaType = "application/json",
                         schema = @Schema(implementation = ApiErrorResponse.class)
@@ -108,7 +108,7 @@ public class ReviewController {
         )
     })
     @PostMapping
-    @PreAuthorize("hasRole('SUPERVISOR')")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<?> createReview(
             @Parameter(description = "Task review details", required = true)
             @Valid @RequestBody CreateReviewRequest request,

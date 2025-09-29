@@ -1,6 +1,5 @@
 package com.enterprise.cleanqueen.dto.project;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import com.enterprise.cleanqueen.enums.TaskPriority;
@@ -22,9 +21,6 @@ public class TaskCreateRequest {
     @Schema(description = "Task priority level", example = "HIGH")
     private TaskPriority priority = TaskPriority.MEDIUM;
 
-    @Schema(description = "Task due date", example = "2025-08-15")
-    private LocalDate dueDate;
-
     @Schema(description = "List of subtasks under this task")
     @Valid
     private List<TaskCreateRequest> subtasks;
@@ -33,11 +29,10 @@ public class TaskCreateRequest {
     public TaskCreateRequest() {
     }
 
-    public TaskCreateRequest(String name, String description, TaskPriority priority, LocalDate dueDate, List<TaskCreateRequest> subtasks) {
+    public TaskCreateRequest(String name, String description, TaskPriority priority, List<TaskCreateRequest> subtasks) {
         this.name = name;
         this.description = description;
         this.priority = priority;
-        this.dueDate = dueDate;
         this.subtasks = subtasks;
     }
 
@@ -64,14 +59,6 @@ public class TaskCreateRequest {
 
     public void setPriority(TaskPriority priority) {
         this.priority = priority;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
     }
 
     public List<TaskCreateRequest> getSubtasks() {

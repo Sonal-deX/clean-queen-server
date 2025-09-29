@@ -104,6 +104,9 @@ public class ProjectListResponse {
         @Schema(description = "Number of completed tasks", example = "2")
         private int completedTasks;
         
+        @Schema(description = "Project average rating", example = "4.5")
+        private Float averageRating;
+        
         @Schema(description = "Project creation date")
         private LocalDateTime createdAt;
         
@@ -115,7 +118,8 @@ public class ProjectListResponse {
         
         public ProjectSummary(String projectId, String projectCode, String projectName, 
                             String description, ProjectStatus status, int totalTasks, 
-                            int completedTasks, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                            int completedTasks, Float averageRating, LocalDateTime createdAt, 
+                            LocalDateTime updatedAt) {
             this.projectId = projectId;
             this.projectCode = projectCode;
             this.projectName = projectName;
@@ -123,6 +127,7 @@ public class ProjectListResponse {
             this.status = status;
             this.totalTasks = totalTasks;
             this.completedTasks = completedTasks;
+            this.averageRating = averageRating;
             this.createdAt = createdAt;
             this.updatedAt = updatedAt;
         }
@@ -182,6 +187,14 @@ public class ProjectListResponse {
         
         public void setCompletedTasks(int completedTasks) {
             this.completedTasks = completedTasks;
+        }
+        
+        public Float getAverageRating() {
+            return averageRating;
+        }
+        
+        public void setAverageRating(Float averageRating) {
+            this.averageRating = averageRating;
         }
         
         public LocalDateTime getCreatedAt() {

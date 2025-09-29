@@ -232,6 +232,9 @@ public class ProjectTaskHierarchyResponse {
         @Schema(description = "Due date")
         private LocalDateTime dueDate;
         
+        @Schema(description = "Task average rating", example = "4.5")
+        private Float averageRating;
+        
         @Schema(description = "Task creation date")
         private LocalDateTime createdAt;
         
@@ -247,7 +250,8 @@ public class ProjectTaskHierarchyResponse {
         public TaskHierarchy(String taskId, String taskName, String description, 
                            TaskStatus status, TaskPriority priority, Double estimatedHours,
                            String assignedUserId, String assignedUserName, LocalDateTime dueDate,
-                           LocalDateTime createdAt, LocalDateTime updatedAt, List<TaskHierarchy> subtasks) {
+                           Float averageRating, LocalDateTime createdAt, LocalDateTime updatedAt, 
+                           List<TaskHierarchy> subtasks) {
             this.taskId = taskId;
             this.taskName = taskName;
             this.description = description;
@@ -257,6 +261,7 @@ public class ProjectTaskHierarchyResponse {
             this.assignedUserId = assignedUserId;
             this.assignedUserName = assignedUserName;
             this.dueDate = dueDate;
+            this.averageRating = averageRating;
             this.createdAt = createdAt;
             this.updatedAt = updatedAt;
             this.subtasks = subtasks;
@@ -333,6 +338,14 @@ public class ProjectTaskHierarchyResponse {
         
         public void setDueDate(LocalDateTime dueDate) {
             this.dueDate = dueDate;
+        }
+        
+        public Float getAverageRating() {
+            return averageRating;
+        }
+        
+        public void setAverageRating(Float averageRating) {
+            this.averageRating = averageRating;
         }
         
         public LocalDateTime getCreatedAt() {

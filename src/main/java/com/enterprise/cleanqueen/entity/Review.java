@@ -37,9 +37,9 @@ public class Review {
     @Column(name = "task_id", length = 8, unique = true, nullable = false)
     private String taskId; // Foreign Key to Task (mandatory, one-to-one)
     
-    @NotBlank(message = "Supervisor ID is required")
-    @Column(name = "supervisor_id", length = 6, nullable = false)
-    private String supervisorId; // Foreign Key to User (mandatory)
+    @NotBlank(message = "Customer ID is required")
+    @Column(name = "customer_id", length = 6, nullable = false)
+    private String customerId; // Foreign Key to User (mandatory) - Customer who gives the rating
     
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -52,12 +52,12 @@ public class Review {
     // Constructors
     public Review() {}
     
-    public Review(String id, Integer rating, String comment, String taskId, String supervisorId) {
+    public Review(String id, Integer rating, String comment, String taskId, String customerId) {
         this.id = id;
         this.rating = rating;
         this.comment = comment;
         this.taskId = taskId;
-        this.supervisorId = supervisorId;
+        this.customerId = customerId;
     }
     
     // Getters and Setters
@@ -73,8 +73,8 @@ public class Review {
     public String getTaskId() { return taskId; }
     public void setTaskId(String taskId) { this.taskId = taskId; }
     
-    public String getSupervisorId() { return supervisorId; }
-    public void setSupervisorId(String supervisorId) { this.supervisorId = supervisorId; }
+    public String getCustomerId() { return customerId; }
+    public void setCustomerId(String customerId) { this.customerId = customerId; }
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

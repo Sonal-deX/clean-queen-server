@@ -1,6 +1,5 @@
 package com.enterprise.cleanqueen.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -45,11 +44,11 @@ public class Task {
     @Column(name = "priority", nullable = false)
     private TaskPriority priority = TaskPriority.MEDIUM;
     
-    @Column(name = "due_date")
-    private LocalDate dueDate;
-    
     @Column(name = "average_rating")
     private Float averageRating;
+    
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
     
     @NotBlank(message = "Project ID is required")
     @Column(name = "project_id", length = 6, nullable = false)
@@ -69,15 +68,15 @@ public class Task {
     // Constructors
     public Task() {}
     
-    public Task(String id, String name, String description, TaskPriority priority, LocalDate dueDate, String projectId, String parentId) {
+    public Task(String id, String name, String description, TaskPriority priority, String projectId, String parentId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.priority = priority;
-        this.dueDate = dueDate;
         this.projectId = projectId;
         this.parentId = parentId;
         this.status = TaskStatus.PENDING;
+        this.isActive = true;
     }
     
     // Getters and Setters
@@ -96,11 +95,11 @@ public class Task {
     public TaskPriority getPriority() { return priority; }
     public void setPriority(TaskPriority priority) { this.priority = priority; }
     
-    public LocalDate getDueDate() { return dueDate; }
-    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
-    
     public Float getAverageRating() { return averageRating; }
     public void setAverageRating(Float averageRating) { this.averageRating = averageRating; }
+    
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
     
     public String getProjectId() { return projectId; }
     public void setProjectId(String projectId) { this.projectId = projectId; }

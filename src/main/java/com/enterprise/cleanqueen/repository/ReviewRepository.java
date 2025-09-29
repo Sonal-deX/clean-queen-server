@@ -15,11 +15,11 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
     
     boolean existsByTaskId(String taskId);
     
-    List<Review> findBySupervisorId(String supervisorId);
+    List<Review> findByCustomerId(String customerId);
     
     List<Review> findByRating(Integer rating);
     
-    List<Review> findBySupervisorIdOrderByCreatedAtDesc(String supervisorId);
+    List<Review> findByCustomerIdOrderByCreatedAtDesc(String customerId);
     
     List<Review> findAllByOrderByCreatedAtDesc();
 }

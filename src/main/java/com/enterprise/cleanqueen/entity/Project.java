@@ -1,5 +1,6 @@
 package com.enterprise.cleanqueen.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,6 +14,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -43,6 +45,16 @@ public class Project {
     @Column(name = "status", nullable = false)
     private ProjectStatus status = ProjectStatus.PENDING_ASSIGNMENT;
     
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+    
+    @Column(name = "address", columnDefinition = "TEXT")
+    private String address;
+    
+    @Min(value = 1, message = "Number of cleaners must be at least 1")
+    @Column(name = "no_of_cleaners")
+    private Integer noOfCleaners;
+    
     @Column(name = "average_rating")
     private Float averageRating;
     
@@ -63,11 +75,15 @@ public class Project {
     // Constructors
     public Project() {}
     
-    public Project(String id, String name, String description, String projectCode) {
+    public Project(String id, String name, String description, String projectCode, 
+                   LocalDate dueDate, String address, Integer noOfCleaners) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.projectCode = projectCode;
+        this.dueDate = dueDate;
+        this.address = address;
+        this.noOfCleaners = noOfCleaners;
         this.status = ProjectStatus.PENDING_ASSIGNMENT;
     }
     
@@ -86,6 +102,15 @@ public class Project {
     
     public ProjectStatus getStatus() { return status; }
     public void setStatus(ProjectStatus status) { this.status = status; }
+    
+    public LocalDate getDueDate() { return dueDate; }
+    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
+    
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+    
+    public Integer getNoOfCleaners() { return noOfCleaners; }
+    public void setNoOfCleaners(Integer noOfCleaners) { this.noOfCleaners = noOfCleaners; }
     
     public Float getAverageRating() { return averageRating; }
     public void setAverageRating(Float averageRating) { this.averageRating = averageRating; }

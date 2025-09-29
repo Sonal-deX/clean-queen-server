@@ -43,10 +43,10 @@ public class ReviewServiceImpl implements ReviewService {
     private CodeGenerator codeGenerator;
 
     @Override
-    public CreateReviewResponse createReview(CreateReviewRequest request, String supervisorEmail) {
-        // Find supervisor
-        User supervisor = userRepository.findByEmail(supervisorEmail)
-                .orElseThrow(() -> new RuntimeException("Supervisor not found"));
+    public CreateReviewResponse createReview(CreateReviewRequest request, String customerEmail) {
+        // Find customer
+        User customer = userRepository.findByEmail(customerEmail)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
 
         // Find task
         Task task = taskRepository.findById(request.getTaskId())
@@ -56,9 +56,9 @@ public class ReviewServiceImpl implements ReviewService {
         Project project = projectRepository.findById(task.getProjectId())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        // Validate supervisor is assigned to this project
-        if (!supervisor.getId().equals(project.getSupervisorId())) {
-            throw new RuntimeException("You are not assigned to this project");
+        // Validate customer is the owner of this project
+        if (!customer.getId().equals(project.getCustomerId())) {
+            throw new RuntimeException("You are not the customer for this project");
         }
 
         // Check if task is a leaf task (has no children)
@@ -78,7 +78,7 @@ public class ReviewServiceImpl implements ReviewService {
         review.setRating(request.getRating());
         review.setComment(request.getComment());
         review.setTaskId(task.getId());
-        review.setSupervisorId(supervisor.getId());
+        review.setCustomerId(customer.getId());
 
         reviewRepository.save(review);
 

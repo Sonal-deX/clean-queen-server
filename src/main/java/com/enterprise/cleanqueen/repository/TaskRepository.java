@@ -36,4 +36,8 @@ public interface TaskRepository extends JpaRepository<Task, String> {
     
     @Query("SELECT COUNT(t) FROM Task t WHERE t.parentId = :parentId")
     long countChildrenTasks(@Param("parentId") String parentId);
+    
+    List<Task> findByIsActive(Boolean isActive);
+    
+    List<Task> findByProjectIdAndIsActive(String projectId, Boolean isActive);
 }
