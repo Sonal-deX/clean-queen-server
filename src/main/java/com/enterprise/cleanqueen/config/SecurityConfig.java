@@ -88,9 +88,9 @@ public class SecurityConfig {
                 // Customer endpoints
                 .requestMatchers("/requests/**").hasRole("CUSTOMER")
                 .requestMatchers("/assignments/customer").hasRole("CUSTOMER")
+                .requestMatchers("/reviews/**").hasRole("CUSTOMER")
                 // Supervisor endpoints
                 .requestMatchers("/assignments/supervisor/**").hasRole("SUPERVISOR")
-                .requestMatchers("/reviews/**").hasRole("SUPERVISOR")
                 // All other endpoints require authentication
                 .anyRequest().authenticated() // All other endpoints require authentication
                 )

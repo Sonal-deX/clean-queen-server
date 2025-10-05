@@ -39,9 +39,19 @@ public class CleaningRequest {
     @Column(name = "phone_number")
     private String phoneNumber;
     
-    @NotBlank(message = "Description is required")
-    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
-    private String description;
+    @NotBlank(message = "Service address is required")
+    @Column(name = "service_address", nullable = false)
+    private String serviceAddress;
+    
+    @NotBlank(message = "Service type is required")
+    @Column(name = "service_type", nullable = false)
+    private String serviceType;
+    
+    @Column(name = "preferred_time")
+    private String preferredTime;
+    
+    @Column(name = "additional_details", columnDefinition = "TEXT")
+    private String additionalDetails;
     
     @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
@@ -62,12 +72,17 @@ public class CleaningRequest {
     // Constructors
     public CleaningRequest() {}
     
-    public CleaningRequest(String id, String name, String email, String phoneNumber, String description) {
+    public CleaningRequest(String id, String name, String email, String phoneNumber, 
+                          String serviceAddress, String serviceType, String preferredTime, 
+                          String additionalDetails) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.description = description;
+        this.serviceAddress = serviceAddress;
+        this.serviceType = serviceType;
+        this.preferredTime = preferredTime;
+        this.additionalDetails = additionalDetails;
         this.status = CleaningRequestStatus.PENDING;
     }
     
@@ -84,8 +99,17 @@ public class CleaningRequest {
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getServiceAddress() { return serviceAddress; }
+    public void setServiceAddress(String serviceAddress) { this.serviceAddress = serviceAddress; }
+    
+    public String getServiceType() { return serviceType; }
+    public void setServiceType(String serviceType) { this.serviceType = serviceType; }
+    
+    public String getPreferredTime() { return preferredTime; }
+    public void setPreferredTime(String preferredTime) { this.preferredTime = preferredTime; }
+    
+    public String getAdditionalDetails() { return additionalDetails; }
+    public void setAdditionalDetails(String additionalDetails) { this.additionalDetails = additionalDetails; }
     
     public CleaningRequestStatus getStatus() { return status; }
     public void setStatus(CleaningRequestStatus status) { this.status = status; }

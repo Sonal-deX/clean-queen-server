@@ -4,8 +4,10 @@ package com.enterprise.cleanqueen.enums;
  * Defines the status of an individual task within a project.
  */
 public enum TaskStatus {
-    PENDING,
+    PENDING_ASSIGNMENT,
     IN_PROGRESS,
+    PENDING_REVIEW,
     COMPLETED,
-    BLOCKED
+    ON_HOLD,
+    CANCELLED
 }

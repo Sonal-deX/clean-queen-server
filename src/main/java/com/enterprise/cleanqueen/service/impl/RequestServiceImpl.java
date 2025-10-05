@@ -53,12 +53,23 @@ public class RequestServiceImpl implements RequestService {
             throw new BusinessException("Invalid phone number format");
         }
 
+        // Validate email format from request
+        if (!validationUtil.isValidEmail(request.getEmail())) {
+            throw new BusinessException("Invalid email format in request");
+        }
+
         // Sanitize inputs for security
         String cleanUserEmail = validationUtil.sanitizeInput(userEmail).toLowerCase();
         String cleanName = validationUtil.sanitizeInput(request.getName());
+        String cleanEmail = validationUtil.sanitizeInput(request.getEmail()).toLowerCase();
         String cleanPhoneNumber = request.getPhoneNumber() != null ? 
             validationUtil.sanitizeInput(request.getPhoneNumber()) : null;
-        String cleanDescription = validationUtil.sanitizeInput(request.getDescription());
+        String cleanServiceAddress = validationUtil.sanitizeInput(request.getServiceAddress());
+        String cleanServiceType = validationUtil.sanitizeInput(request.getServiceType());
+        String cleanPreferredTime = request.getPreferredTime() != null ?
+            validationUtil.sanitizeInput(request.getPreferredTime()) : null;
+        String cleanAdditionalDetails = request.getAdditionalDetails() != null ?
+            validationUtil.sanitizeInput(request.getAdditionalDetails()) : null;
 
         // Find user
         User user = userRepository.findByEmail(cleanUserEmail)
@@ -68,9 +79,12 @@ public class RequestServiceImpl implements RequestService {
         CleaningRequest cleaningRequest = new CleaningRequest();
         cleaningRequest.setId(codeGenerator.generateRequestId());
         cleaningRequest.setName(cleanName);
-        cleaningRequest.setEmail(user.getEmail()); // Use authenticated user's email
+        cleaningRequest.setEmail(cleanEmail); // Use email from request
         cleaningRequest.setPhoneNumber(cleanPhoneNumber);
-        cleaningRequest.setDescription(cleanDescription);
+        cleaningRequest.setServiceAddress(cleanServiceAddress);
+        cleaningRequest.setServiceType(cleanServiceType);
+        cleaningRequest.setPreferredTime(cleanPreferredTime);
+        cleaningRequest.setAdditionalDetails(cleanAdditionalDetails);
         cleaningRequest.setStatus(CleaningRequestStatus.PENDING);
         cleaningRequest.setUserId(user.getId());
 

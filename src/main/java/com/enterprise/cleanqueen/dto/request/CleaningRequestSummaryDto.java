@@ -10,7 +10,10 @@ public class CleaningRequestSummaryDto {
     private String name;
     private String email;
     private String phoneNumber;
-    private String description;
+    private String serviceAddress;
+    private String serviceType;
+    private String preferredTime;
+    private String additionalDetails;
     private CleaningRequestStatus status;
     private String userId;
     private LocalDateTime createdAt;
@@ -20,13 +23,17 @@ public class CleaningRequestSummaryDto {
     public CleaningRequestSummaryDto() {}
     
     public CleaningRequestSummaryDto(String id, String name, String email, String phoneNumber, 
-                                   String description, CleaningRequestStatus status, String userId,
+                                   String serviceAddress, String serviceType, String preferredTime,
+                                   String additionalDetails, CleaningRequestStatus status, String userId,
                                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.description = description;
+        this.serviceAddress = serviceAddress;
+        this.serviceType = serviceType;
+        this.preferredTime = preferredTime;
+        this.additionalDetails = additionalDetails;
         this.status = status;
         this.userId = userId;
         this.createdAt = createdAt;
@@ -66,12 +73,36 @@ public class CleaningRequestSummaryDto {
         this.phoneNumber = phoneNumber;
     }
     
-    public String getDescription() {
-        return description;
+    public String getServiceAddress() {
+        return serviceAddress;
     }
     
-    public void setDescription(String description) {
-        this.description = description;
+    public void setServiceAddress(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
+    }
+    
+    public String getServiceType() {
+        return serviceType;
+    }
+    
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
+    
+    public String getPreferredTime() {
+        return preferredTime;
+    }
+    
+    public void setPreferredTime(String preferredTime) {
+        this.preferredTime = preferredTime;
+    }
+    
+    public String getAdditionalDetails() {
+        return additionalDetails;
+    }
+    
+    public void setAdditionalDetails(String additionalDetails) {
+        this.additionalDetails = additionalDetails;
     }
     
     public CleaningRequestStatus getStatus() {

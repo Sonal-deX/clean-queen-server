@@ -68,10 +68,12 @@ public class TaskController {
         ```
         
         **Available Task Statuses:**
-        - PENDING: Task is waiting to be started
+        - PENDING_ASSIGNMENT: Task is waiting to be assigned
         - IN_PROGRESS: Task is currently being worked on
-        - COMPLETED: Task has been finished
-        - BLOCKED: Task is blocked by some issue
+        - PENDING_REVIEW: Task is completed and awaiting review
+        - COMPLETED: Task has been finished and approved
+        - ON_HOLD: Task is temporarily paused
+        - CANCELLED: Task has been cancelled
         
         **Process:**
         1. Supervisor provides task ID and new status

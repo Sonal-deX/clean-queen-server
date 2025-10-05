@@ -17,16 +17,19 @@ import com.enterprise.cleanqueen.dto.project.ProjectCreateRequest;
 import com.enterprise.cleanqueen.dto.project.ProjectCreateResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectListResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectTaskHierarchyResponse;
+import com.enterprise.cleanqueen.dto.project.ProjectTaskReviewsResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectUpdateRequest;
 import com.enterprise.cleanqueen.dto.project.ProjectUpdateResponse;
 import com.enterprise.cleanqueen.dto.project.TaskCreateRequest;
 import com.enterprise.cleanqueen.dto.project.TaskUpdateRequest;
 import com.enterprise.cleanqueen.entity.Project;
+import com.enterprise.cleanqueen.entity.Review;
 import com.enterprise.cleanqueen.entity.Task;
 import com.enterprise.cleanqueen.enums.ProjectStatus;
 import com.enterprise.cleanqueen.enums.TaskPriority;
 import com.enterprise.cleanqueen.enums.TaskStatus;
 import com.enterprise.cleanqueen.repository.ProjectRepository;
+import com.enterprise.cleanqueen.repository.ReviewRepository;
 import com.enterprise.cleanqueen.repository.TaskRepository;
 import com.enterprise.cleanqueen.service.ProjectService;
 import com.enterprise.cleanqueen.util.CodeGenerator;
@@ -42,6 +45,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @Autowired
     private CodeGenerator codeGenerator;
@@ -173,7 +179,7 @@ public class ProjectServiceImpl implements ProjectService {
             // Set/update task properties
             task.setName(taskRequest.getName());
             task.setDescription(taskRequest.getDescription());
-            task.setStatus(taskRequest.getStatus() != null ? taskRequest.getStatus() : TaskStatus.PENDING);
+            task.setStatus(taskRequest.getStatus() != null ? taskRequest.getStatus() : TaskStatus.PENDING_ASSIGNMENT);
             task.setPriority(taskRequest.getPriority() != null ? taskRequest.getPriority() : TaskPriority.MEDIUM);
             task.setProjectId(projectId);
             task.setParentId(parentTaskId);
@@ -202,7 +208,7 @@ public class ProjectServiceImpl implements ProjectService {
             task.setId(codeGenerator.generateTaskId());
             task.setName(taskRequest.getName());
             task.setDescription(taskRequest.getDescription());
-            task.setStatus(TaskStatus.PENDING);
+            task.setStatus(TaskStatus.PENDING_ASSIGNMENT);
             task.setPriority(taskRequest.getPriority() != null ? taskRequest.getPriority() : com.enterprise.cleanqueen.enums.TaskPriority.MEDIUM);
             task.setProjectId(projectId);
             task.setParentId(parentTaskId);
@@ -313,6 +319,9 @@ public class ProjectServiceImpl implements ProjectService {
             project.getName(),
             project.getDescription(),
             project.getStatus(),
+            project.getDueDate(),
+            project.getNoOfCleaners(),
+            project.getAddress(),
             totalTasks,
             completedTasks,
             project.getAverageRating(),
@@ -344,6 +353,57 @@ public class ProjectServiceImpl implements ProjectService {
             task.getCreatedAt(),
             task.getUpdatedAt(),
             subtaskHierarchies
+        );
+    }
+
+    @Override
+    public ProjectTaskReviewsResponse getProjectTaskReviews(String projectId) {
+        try {
+            // Find the project
+            Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
+            
+            // Get all tasks for this project
+            List<Task> allTasks = taskRepository.findByProjectId(projectId);
+            
+            // Convert to TaskReviewInfo list
+            List<ProjectTaskReviewsResponse.TaskReviewInfo> taskReviewInfos = allTasks.stream()
+                .map(this::convertToTaskReviewInfo)
+                .collect(Collectors.toList());
+            
+            String message = String.format("Retrieved %d tasks with review information for project %s", 
+                                         taskReviewInfos.size(), projectId);
+            logger.info(message);
+            
+            return new ProjectTaskReviewsResponse(true, message, project.getId(), 
+                                                project.getName(), taskReviewInfos);
+            
+        } catch (Exception e) {
+            logger.error("Error retrieving task reviews for project {}: {}", projectId, e.getMessage());
+            throw new RuntimeException("Failed to retrieve task reviews for project: " + projectId, e);
+        }
+    }
+
+    private ProjectTaskReviewsResponse.TaskReviewInfo convertToTaskReviewInfo(Task task) {
+        // Find review for this task
+        Review review = reviewRepository.findByTaskId(task.getId()).orElse(null);
+        
+        String reviewComment = null;
+        Float rating = null;
+        boolean hasReview = false;
+        
+        if (review != null) {
+            reviewComment = review.getComment();
+            rating = review.getRating().floatValue();
+            hasReview = true;
+        }
+        
+        return new ProjectTaskReviewsResponse.TaskReviewInfo(
+            task.getId(),
+            task.getName(),
+            reviewComment,
+            rating,
+            hasReview
         );
     }
 }

@@ -1,6 +1,7 @@
 package com.enterprise.cleanqueen.dto.review;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class CreateReviewResponse {
 
@@ -11,6 +12,7 @@ public class CreateReviewResponse {
     private String taskName;
     private Integer rating;
     private boolean ratingPropagated;
+    private List<String> imageUrls;
     private LocalDateTime timestamp;
 
     // Constructors
@@ -27,6 +29,18 @@ public class CreateReviewResponse {
         this.taskName = taskName;
         this.rating = rating;
         this.ratingPropagated = ratingPropagated;
+    }
+
+    public CreateReviewResponse(boolean success, String message, String reviewId, String taskId, String taskName, Integer rating, boolean ratingPropagated, List<String> imageUrls) {
+        this();
+        this.success = success;
+        this.message = message;
+        this.reviewId = reviewId;
+        this.taskId = taskId;
+        this.taskName = taskName;
+        this.rating = rating;
+        this.ratingPropagated = ratingPropagated;
+        this.imageUrls = imageUrls;
     }
 
     // Getters and Setters
@@ -92,5 +106,13 @@ public class CreateReviewResponse {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 }

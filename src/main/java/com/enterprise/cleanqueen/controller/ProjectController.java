@@ -18,6 +18,7 @@ import com.enterprise.cleanqueen.dto.project.ProjectCreateRequest;
 import com.enterprise.cleanqueen.dto.project.ProjectCreateResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectListResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectTaskHierarchyResponse;
+import com.enterprise.cleanqueen.dto.project.ProjectTaskReviewsResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectUpdateRequest;
 import com.enterprise.cleanqueen.dto.project.ProjectUpdateResponse;
 import com.enterprise.cleanqueen.service.ProjectService;
@@ -304,6 +305,76 @@ public class ProjectController {
         ProjectTaskHierarchyResponse response = projectService.getProjectTaskHierarchy(projectId);
         logger.info("Retrieved task hierarchy for project: {} with {} total tasks", 
                    projectId, response.getProject().getTotalTasks());
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Get Project Tasks with Reviews",
+            description = """
+        **Retrieve all tasks in a project with their review information.**
+        
+        **Returns for each task:**
+        - Task ID and name
+        - Review comment (if reviewed)
+        - Rating (if reviewed)
+        - Review status (whether task has been reviewed)
+        
+        **Admin Only Access:**
+        - Only users with ADMIN role can access this endpoint
+        - Requires valid JWT authentication with admin privileges
+        
+        **Use Cases:**
+        - View project completion status with feedback
+        - Display task reviews and ratings
+        - Generate project review reports
+        - Monitor task quality assessments
+        """,
+            tags = {"Project Management"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+                responseCode = "200",
+                description = "✅ Project task reviews retrieved successfully",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ProjectTaskReviewsResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "403",
+                description = "❌ Access denied - Admin role required",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "404",
+                description = "❌ Project not found",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        )
+    })
+    @GetMapping("/{projectId}/reviews")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "JWT Authentication")
+    public ResponseEntity<?> getProjectTaskReviews(
+            @Parameter(description = "Project ID to get task reviews for", required = true, example = "PROJ123")
+            @PathVariable String projectId) {
+
+        ProjectTaskReviewsResponse response = projectService.getProjectTaskReviews(projectId);
+        logger.info("Retrieved task reviews for project: {} with {} total tasks", 
+                   projectId, response.getTotalTasks());
         return ResponseEntity.ok(response);
     }
 }

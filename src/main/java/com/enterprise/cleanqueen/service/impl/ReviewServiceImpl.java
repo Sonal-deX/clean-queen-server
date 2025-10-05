@@ -1,5 +1,6 @@
 package com.enterprise.cleanqueen.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import com.enterprise.cleanqueen.repository.ProjectRepository;
 import com.enterprise.cleanqueen.repository.ReviewRepository;
 import com.enterprise.cleanqueen.repository.TaskRepository;
 import com.enterprise.cleanqueen.repository.UserRepository;
+import com.enterprise.cleanqueen.service.CloudflareR2Service;
 import com.enterprise.cleanqueen.service.ReviewService;
 import com.enterprise.cleanqueen.util.CodeGenerator;
 
@@ -41,6 +43,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Autowired
     private CodeGenerator codeGenerator;
+
+    @Autowired
+    private CloudflareR2Service cloudflareR2Service;
 
     @Override
     public CreateReviewResponse createReview(CreateReviewRequest request, String customerEmail) {
@@ -72,6 +77,18 @@ public class ReviewServiceImpl implements ReviewService {
             throw new RuntimeException("This task has already been reviewed");
         }
 
+        // Upload images first (if any)
+        List<String> imageUrls = new ArrayList<>();
+        if (request.getImages() != null && !request.getImages().isEmpty()) {
+            try {
+                imageUrls = cloudflareR2Service.uploadImages(request.getImages());
+                logger.info("Successfully uploaded {} images for review", imageUrls.size());
+            } catch (Exception e) {
+                logger.error("Failed to upload images for review", e);
+                throw new RuntimeException("Failed to upload images: " + e.getMessage());
+            }
+        }
+
         // Create review
         Review review = new Review();
         review.setId(codeGenerator.generateReviewId());
@@ -80,7 +97,24 @@ public class ReviewServiceImpl implements ReviewService {
         review.setTaskId(task.getId());
         review.setCustomerId(customer.getId());
 
-        reviewRepository.save(review);
+        // Set image URLs
+        if (imageUrls.size() > 0) {
+            review.setImageUrl1(imageUrls.get(0));
+        }
+        if (imageUrls.size() > 1) {
+            review.setImageUrl2(imageUrls.get(1));
+        }
+
+        try {
+            reviewRepository.save(review);
+        } catch (Exception e) {
+            // If review creation fails, delete uploaded images
+            if (!imageUrls.isEmpty()) {
+                logger.warn("Review creation failed, cleaning up uploaded images");
+                cloudflareR2Service.deleteImages(imageUrls);
+            }
+            throw new RuntimeException("Failed to create review: " + e.getMessage());
+        }
 
         // Set task rating
         task.setAverageRating(request.getRating().floatValue());
@@ -98,7 +132,8 @@ public class ReviewServiceImpl implements ReviewService {
                 task.getId(),
                 task.getName(),
                 request.getRating(),
-                propagated
+                propagated,
+                imageUrls
         );
     }
 

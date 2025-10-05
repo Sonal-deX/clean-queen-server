@@ -4,6 +4,7 @@ import com.enterprise.cleanqueen.dto.project.ProjectCreateRequest;
 import com.enterprise.cleanqueen.dto.project.ProjectCreateResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectListResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectTaskHierarchyResponse;
+import com.enterprise.cleanqueen.dto.project.ProjectTaskReviewsResponse;
 import com.enterprise.cleanqueen.dto.project.ProjectUpdateRequest;
 import com.enterprise.cleanqueen.dto.project.ProjectUpdateResponse;
 
@@ -16,4 +17,6 @@ public interface ProjectService {
     ProjectListResponse getProjectsByUserId(String userId);
     
     ProjectTaskHierarchyResponse getProjectTaskHierarchy(String projectId);
+    
+    ProjectTaskReviewsResponse getProjectTaskReviews(String projectId);
 }

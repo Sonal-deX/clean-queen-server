@@ -37,7 +37,7 @@ public class Task {
     @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private TaskStatus status = TaskStatus.PENDING;
+    private TaskStatus status = TaskStatus.PENDING_ASSIGNMENT;
     
     @NotNull(message = "Priority is required")
     @Enumerated(EnumType.STRING)
@@ -75,7 +75,7 @@ public class Task {
         this.priority = priority;
         this.projectId = projectId;
         this.parentId = parentId;
-        this.status = TaskStatus.PENDING;
+        this.status = TaskStatus.PENDING_ASSIGNMENT;
         this.isActive = true;
     }
     

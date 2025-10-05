@@ -41,6 +41,12 @@ public class Review {
     @Column(name = "customer_id", length = 6, nullable = false)
     private String customerId; // Foreign Key to User (mandatory) - Customer who gives the rating
     
+    @Column(name = "image_url_1", length = 500)
+    private String imageUrl1; // First image URL (optional)
+    
+    @Column(name = "image_url_2", length = 500)
+    private String imageUrl2; // Second image URL (optional)
+    
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -58,6 +64,16 @@ public class Review {
         this.comment = comment;
         this.taskId = taskId;
         this.customerId = customerId;
+    }
+    
+    public Review(String id, Integer rating, String comment, String taskId, String customerId, String imageUrl1, String imageUrl2) {
+        this.id = id;
+        this.rating = rating;
+        this.comment = comment;
+        this.taskId = taskId;
+        this.customerId = customerId;
+        this.imageUrl1 = imageUrl1;
+        this.imageUrl2 = imageUrl2;
     }
     
     // Getters and Setters
@@ -81,4 +97,10 @@ public class Review {
     
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    
+    public String getImageUrl1() { return imageUrl1; }
+    public void setImageUrl1(String imageUrl1) { this.imageUrl1 = imageUrl1; }
+    
+    public String getImageUrl2() { return imageUrl2; }
+    public void setImageUrl2(String imageUrl2) { this.imageUrl2 = imageUrl2; }
 }

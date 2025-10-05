@@ -6,6 +6,7 @@ import com.enterprise.cleanqueen.dto.admin.DeleteTaskResponse;
 import com.enterprise.cleanqueen.dto.admin.GetAllCleaningRequestsResponse;
 import com.enterprise.cleanqueen.dto.admin.GetAllCustomersResponse;
 import com.enterprise.cleanqueen.dto.admin.GetAllSupervisorsResponse;
+import com.enterprise.cleanqueen.dto.admin.GetAllProjectsResponse;
 import com.enterprise.cleanqueen.dto.admin.SendProjectCodeRequest;
 import com.enterprise.cleanqueen.dto.admin.SendProjectCodeResponse;
 
@@ -22,5 +23,7 @@ public interface AdminService {
     GetAllCleaningRequestsResponse getAllCleaningRequests();
 
     DeleteTaskResponse deleteTask(String taskId);
+
+    GetAllProjectsResponse getAllProjects();
 
 }

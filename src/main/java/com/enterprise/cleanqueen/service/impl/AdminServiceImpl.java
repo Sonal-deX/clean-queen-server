@@ -17,6 +17,7 @@ import com.enterprise.cleanqueen.dto.admin.DeleteTaskResponse;
 import com.enterprise.cleanqueen.dto.admin.GetAllCleaningRequestsResponse;
 import com.enterprise.cleanqueen.dto.admin.GetAllCustomersResponse;
 import com.enterprise.cleanqueen.dto.admin.GetAllSupervisorsResponse;
+import com.enterprise.cleanqueen.dto.admin.GetAllProjectsResponse;
 import com.enterprise.cleanqueen.dto.admin.SendProjectCodeRequest;
 import com.enterprise.cleanqueen.dto.admin.SendProjectCodeResponse;
 import com.enterprise.cleanqueen.dto.request.CleaningRequestSummaryDto;
@@ -237,11 +238,83 @@ public class AdminServiceImpl implements AdminService {
                 request.getName(),
                 request.getEmail(),
                 request.getPhoneNumber(),
-                request.getDescription(),
+                request.getServiceAddress(),
+                request.getServiceType(),
+                request.getPreferredTime(),
+                request.getAdditionalDetails(),
                 request.getStatus(),
                 request.getUserId(),
                 request.getCreatedAt(),
                 request.getUpdatedAt()
+        );
+    }
+
+    @Override
+    public GetAllProjectsResponse getAllProjects() {
+        try {
+            // Get all projects
+            List<Project> allProjects = projectRepository.findAll();
+            
+            // Convert to ProjectInfo DTOs
+            List<GetAllProjectsResponse.ProjectInfo> projectInfos = allProjects.stream()
+                .map(this::convertToProjectInfo)
+                .collect(Collectors.toList());
+            
+            String message = String.format("Retrieved %d projects successfully", projectInfos.size());
+            logger.info(message);
+            
+            return new GetAllProjectsResponse(true, message, projectInfos);
+            
+        } catch (Exception e) {
+            logger.error("Error retrieving all projects: {}", e.getMessage());
+            throw new RuntimeException("Failed to retrieve all projects", e);
+        }
+    }
+
+    private GetAllProjectsResponse.ProjectInfo convertToProjectInfo(Project project) {
+        // Get customer information
+        String customerName = null;
+        Optional<User> customer = userRepository.findById(project.getCustomerId());
+        if (customer.isPresent()) {
+            User c = customer.get();
+            customerName = c.getFirstName() + (c.getLastName() != null ? " " + c.getLastName() : "");
+        }
+        
+        // Get supervisor information
+        String supervisorName = null;
+        if (project.getSupervisorId() != null) {
+            Optional<User> supervisor = userRepository.findById(project.getSupervisorId());
+            if (supervisor.isPresent()) {
+                User s = supervisor.get();
+                supervisorName = s.getFirstName() + (s.getLastName() != null ? " " + s.getLastName() : "");
+            }
+        }
+        
+        // Get task statistics
+        List<Task> projectTasks = taskRepository.findByProjectId(project.getId());
+        int totalTasks = projectTasks.size();
+        int completedTasks = (int) projectTasks.stream()
+            .filter(task -> task.getStatus() == com.enterprise.cleanqueen.enums.TaskStatus.COMPLETED)
+            .count();
+        
+        return new GetAllProjectsResponse.ProjectInfo(
+            project.getId(),
+            project.getProjectCode(),
+            project.getName(),
+            project.getDescription(),
+            project.getStatus(),
+            project.getDueDate(),
+            project.getAddress(),
+            project.getNoOfCleaners(),
+            project.getCustomerId(),
+            customerName,
+            project.getSupervisorId(),
+            supervisorName,
+            totalTasks,
+            completedTasks,
+            project.getAverageRating(),
+            project.getCreatedAt(),
+            project.getUpdatedAt()
         );
     }
 }

@@ -19,6 +19,7 @@ import com.enterprise.cleanqueen.dto.admin.GetAllSupervisorsResponse;
 import com.enterprise.cleanqueen.dto.admin.DeleteTaskResponse;
 import com.enterprise.cleanqueen.dto.admin.GetAllCustomersResponse;
 import com.enterprise.cleanqueen.dto.admin.GetAllCleaningRequestsResponse;
+import com.enterprise.cleanqueen.dto.admin.GetAllProjectsResponse;
 import com.enterprise.cleanqueen.dto.common.ApiErrorResponse;
 import com.enterprise.cleanqueen.service.AdminService;
 
@@ -365,6 +366,64 @@ public class AdminController {
             @Parameter(description = "Task ID to delete", required = true)
             @PathVariable String taskId) {
         DeleteTaskResponse response = adminService.deleteTask(taskId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Get All Projects",
+            description = """
+        **Retrieve all projects in the system with detailed information.**
+        
+        **Admin Only Access:**
+        - Only users with ADMIN role can access this endpoint
+        - Returns comprehensive project information including customer and supervisor details
+        - Includes task statistics and project progress information
+        
+        **Project Information Includes:**
+        - Basic project details (ID, code, name, description, status)
+        - Project specifications (due date, address, number of cleaners)
+        - Customer and supervisor information (IDs and names)
+        - Task statistics (total tasks, completed tasks)
+        - Project rating and timestamps
+        
+        **Use Cases:**
+        - System monitoring and overview
+        - Project management dashboard
+        - Administrative reporting
+        - Performance analysis
+        """,
+            tags = {"Admin Management"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+                responseCode = "200",
+                description = "✅ All projects retrieved successfully",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = GetAllProjectsResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "401",
+                description = "❌ Unauthorized - Invalid or missing authentication token",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "403",
+                description = "❌ Access denied - Admin role required",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class)
+                )
+        )
+    })
+    @GetMapping("/projects")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllProjects() {
+        GetAllProjectsResponse response = adminService.getAllProjects();
         return ResponseEntity.ok(response);
     }
 }
