@@ -66,8 +66,6 @@ public class RequestServiceImpl implements RequestService {
             validationUtil.sanitizeInput(request.getPhoneNumber()) : null;
         String cleanServiceAddress = validationUtil.sanitizeInput(request.getServiceAddress());
         String cleanServiceType = validationUtil.sanitizeInput(request.getServiceType());
-        String cleanPreferredTime = request.getPreferredTime() != null ?
-            validationUtil.sanitizeInput(request.getPreferredTime()) : null;
         String cleanAdditionalDetails = request.getAdditionalDetails() != null ?
             validationUtil.sanitizeInput(request.getAdditionalDetails()) : null;
 
@@ -83,7 +81,9 @@ public class RequestServiceImpl implements RequestService {
         cleaningRequest.setPhoneNumber(cleanPhoneNumber);
         cleaningRequest.setServiceAddress(cleanServiceAddress);
         cleaningRequest.setServiceType(cleanServiceType);
-        cleaningRequest.setPreferredTime(cleanPreferredTime);
+        cleaningRequest.setPreferredDate(request.getPreferredDate());
+        cleaningRequest.setTimeFrom(request.getTimeFrom());
+        cleaningRequest.setTimeTo(request.getTimeTo());
         cleaningRequest.setAdditionalDetails(cleanAdditionalDetails);
         cleaningRequest.setStatus(CleaningRequestStatus.PENDING);
         cleaningRequest.setUserId(user.getId());

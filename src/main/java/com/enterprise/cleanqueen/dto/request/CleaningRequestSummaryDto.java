@@ -1,6 +1,8 @@
 package com.enterprise.cleanqueen.dto.request;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import com.enterprise.cleanqueen.enums.CleaningRequestStatus;
 
@@ -12,7 +14,9 @@ public class CleaningRequestSummaryDto {
     private String phoneNumber;
     private String serviceAddress;
     private String serviceType;
-    private String preferredTime;
+    private LocalDate preferredDate;
+    private LocalTime timeFrom;
+    private LocalTime timeTo;
     private String additionalDetails;
     private CleaningRequestStatus status;
     private String userId;
@@ -23,8 +27,9 @@ public class CleaningRequestSummaryDto {
     public CleaningRequestSummaryDto() {}
     
     public CleaningRequestSummaryDto(String id, String name, String email, String phoneNumber, 
-                                   String serviceAddress, String serviceType, String preferredTime,
-                                   String additionalDetails, CleaningRequestStatus status, String userId,
+                                   String serviceAddress, String serviceType, LocalDate preferredDate,
+                                   LocalTime timeFrom, LocalTime timeTo, String additionalDetails, 
+                                   CleaningRequestStatus status, String userId,
                                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
@@ -32,7 +37,9 @@ public class CleaningRequestSummaryDto {
         this.phoneNumber = phoneNumber;
         this.serviceAddress = serviceAddress;
         this.serviceType = serviceType;
-        this.preferredTime = preferredTime;
+        this.preferredDate = preferredDate;
+        this.timeFrom = timeFrom;
+        this.timeTo = timeTo;
         this.additionalDetails = additionalDetails;
         this.status = status;
         this.userId = userId;
@@ -89,12 +96,28 @@ public class CleaningRequestSummaryDto {
         this.serviceType = serviceType;
     }
     
-    public String getPreferredTime() {
-        return preferredTime;
+    public LocalDate getPreferredDate() {
+        return preferredDate;
     }
     
-    public void setPreferredTime(String preferredTime) {
-        this.preferredTime = preferredTime;
+    public void setPreferredDate(LocalDate preferredDate) {
+        this.preferredDate = preferredDate;
+    }
+    
+    public LocalTime getTimeFrom() {
+        return timeFrom;
+    }
+    
+    public void setTimeFrom(LocalTime timeFrom) {
+        this.timeFrom = timeFrom;
+    }
+    
+    public LocalTime getTimeTo() {
+        return timeTo;
+    }
+    
+    public void setTimeTo(LocalTime timeTo) {
+        this.timeTo = timeTo;
     }
     
     public String getAdditionalDetails() {

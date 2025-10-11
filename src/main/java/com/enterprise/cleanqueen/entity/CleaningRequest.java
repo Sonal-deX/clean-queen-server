@@ -1,6 +1,8 @@
 package com.enterprise.cleanqueen.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -47,8 +49,14 @@ public class CleaningRequest {
     @Column(name = "service_type", nullable = false)
     private String serviceType;
     
-    @Column(name = "preferred_time")
-    private String preferredTime;
+    @Column(name = "preferred_date")
+    private LocalDate preferredDate;
+    
+    @Column(name = "time_from")
+    private LocalTime timeFrom;
+    
+    @Column(name = "time_to")
+    private LocalTime timeTo;
     
     @Column(name = "additional_details", columnDefinition = "TEXT")
     private String additionalDetails;
@@ -73,15 +81,17 @@ public class CleaningRequest {
     public CleaningRequest() {}
     
     public CleaningRequest(String id, String name, String email, String phoneNumber, 
-                          String serviceAddress, String serviceType, String preferredTime, 
-                          String additionalDetails) {
+                          String serviceAddress, String serviceType, LocalDate preferredDate,
+                          LocalTime timeFrom, LocalTime timeTo, String additionalDetails) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.serviceAddress = serviceAddress;
         this.serviceType = serviceType;
-        this.preferredTime = preferredTime;
+        this.preferredDate = preferredDate;
+        this.timeFrom = timeFrom;
+        this.timeTo = timeTo;
         this.additionalDetails = additionalDetails;
         this.status = CleaningRequestStatus.PENDING;
     }
@@ -105,8 +115,14 @@ public class CleaningRequest {
     public String getServiceType() { return serviceType; }
     public void setServiceType(String serviceType) { this.serviceType = serviceType; }
     
-    public String getPreferredTime() { return preferredTime; }
-    public void setPreferredTime(String preferredTime) { this.preferredTime = preferredTime; }
+    public LocalDate getPreferredDate() { return preferredDate; }
+    public void setPreferredDate(LocalDate preferredDate) { this.preferredDate = preferredDate; }
+    
+    public LocalTime getTimeFrom() { return timeFrom; }
+    public void setTimeFrom(LocalTime timeFrom) { this.timeFrom = timeFrom; }
+    
+    public LocalTime getTimeTo() { return timeTo; }
+    public void setTimeTo(LocalTime timeTo) { this.timeTo = timeTo; }
     
     public String getAdditionalDetails() { return additionalDetails; }
     public void setAdditionalDetails(String additionalDetails) { this.additionalDetails = additionalDetails; }

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.enterprise.cleanqueen.service.CloudflareR2Service;
+import com.enterprise.cleanqueen.util.ImageCompressionUtil;
+import com.enterprise.cleanqueen.util.ImageCompressionUtil.CompressedImageResult;
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -44,6 +46,12 @@ public class CloudflareR2ServiceImpl implements CloudflareR2Service {
     private String publicDomain;
 
     private S3Client s3Client;
+
+    private final ImageCompressionUtil imageCompressionUtil;
+
+    public CloudflareR2ServiceImpl(ImageCompressionUtil imageCompressionUtil) {
+        this.imageCompressionUtil = imageCompressionUtil;
+    }
 
     private S3Client getS3Client() {
         if (s3Client == null) {
@@ -99,6 +107,27 @@ public class CloudflareR2ServiceImpl implements CloudflareR2Service {
     private String uploadSingleImage(MultipartFile image) throws IOException {
         validateImage(image);
 
+        // Compress the image
+        CompressedImageResult compressionResult;
+        try {
+            compressionResult = imageCompressionUtil.compressImage(image);
+            logger.info("Image compression completed - Original: {}KB, Compressed: {}KB, Reduction: {}%",
+                image.getSize() / 1024,
+                compressionResult.getSizeKb(),
+                compressionResult.wasCompressed() ? 
+                    Math.round(((double)(image.getSize() - compressionResult.getSizeBytes()) / image.getSize()) * 100) : 0
+            );
+        } catch (Exception e) {
+            logger.error("Image compression failed, uploading original image", e);
+            // Fallback to original image if compression fails
+            compressionResult = new CompressedImageResult(
+                image.getBytes(), 
+                image.getContentType(), 
+                image.getSize(), 
+                false
+            );
+        }
+
         String fileName = generateUniqueFileName(image.getOriginalFilename());
         String key = "reviews/" + fileName; // Store in reviews folder
 
@@ -106,11 +135,11 @@ public class CloudflareR2ServiceImpl implements CloudflareR2Service {
             PutObjectRequest putRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(key)
-                    .contentType(image.getContentType())
-                    .contentLength(image.getSize())
+                    .contentType(compressionResult.getContentType())
+                    .contentLength(compressionResult.getSizeBytes())
                     .build();
 
-            RequestBody requestBody = RequestBody.fromBytes(image.getBytes());
+            RequestBody requestBody = RequestBody.fromBytes(compressionResult.getImageData());
             
             getS3Client().putObject(putRequest, requestBody);
             
@@ -163,10 +192,10 @@ public class CloudflareR2ServiceImpl implements CloudflareR2Service {
     }
 
     private void validateImage(MultipartFile image) {
-        // Check file size (max 10MB)
-        long maxSizeInBytes = 10 * 1024 * 1024; // 10MB
+        // Check file size (max 25MB - increased since we compress images)
+        long maxSizeInBytes = 25 * 1024 * 1024; // 25MB
         if (image.getSize() > maxSizeInBytes) {
-            throw new RuntimeException("Image size exceeds maximum limit of 10MB");
+            throw new RuntimeException("Image size exceeds maximum limit of 25MB");
         }
 
         // Check file type
@@ -177,6 +206,11 @@ public class CloudflareR2ServiceImpl implements CloudflareR2Service {
                                    !contentType.startsWith("image/gif") && 
                                    !contentType.startsWith("image/webp"))) {
             throw new RuntimeException("Invalid image format. Supported formats: JPEG, PNG, GIF, WebP");
+        }
+
+        // Basic image validation - ensure it's not empty
+        if (image.isEmpty()) {
+            throw new RuntimeException("Image file is empty");
         }
     }
 

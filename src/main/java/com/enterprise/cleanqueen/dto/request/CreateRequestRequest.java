@@ -1,7 +1,11 @@
 package com.enterprise.cleanqueen.dto.request;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Schema(description = "Create cleaning request")
@@ -29,9 +33,15 @@ public class CreateRequestRequest {
     @Size(max = 100, message = "Service type cannot exceed 100 characters")
     private String serviceType;
 
-    @Schema(description = "Preferred time for service", example = "Morning (9 AM - 12 PM)")
-    @Size(max = 100, message = "Preferred time cannot exceed 100 characters")
-    private String preferredTime;
+    @Schema(description = "Preferred date for service", example = "2024-01-15", required = true)
+    @NotNull(message = "Preferred date is required")
+    private LocalDate preferredDate;
+
+    @Schema(description = "Preferred start time", example = "09:00")
+    private LocalTime timeFrom;
+
+    @Schema(description = "Preferred end time", example = "17:00")
+    private LocalTime timeTo;
 
     @Schema(description = "Additional details or special requirements", example = "Please use eco-friendly products")
     @Size(max = 1000, message = "Additional details cannot exceed 1000 characters")
@@ -43,13 +53,16 @@ public class CreateRequestRequest {
 
     public CreateRequestRequest(String name, String phoneNumber, String email, 
                                String serviceAddress, String serviceType, 
-                               String preferredTime, String additionalDetails) {
+                               LocalDate preferredDate, LocalTime timeFrom, LocalTime timeTo,
+                               String additionalDetails) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.serviceAddress = serviceAddress;
         this.serviceType = serviceType;
-        this.preferredTime = preferredTime;
+        this.preferredDate = preferredDate;
+        this.timeFrom = timeFrom;
+        this.timeTo = timeTo;
         this.additionalDetails = additionalDetails;
     }
 
@@ -94,12 +107,28 @@ public class CreateRequestRequest {
         this.serviceType = serviceType;
     }
 
-    public String getPreferredTime() {
-        return preferredTime;
+    public LocalDate getPreferredDate() {
+        return preferredDate;
     }
 
-    public void setPreferredTime(String preferredTime) {
-        this.preferredTime = preferredTime;
+    public void setPreferredDate(LocalDate preferredDate) {
+        this.preferredDate = preferredDate;
+    }
+
+    public LocalTime getTimeFrom() {
+        return timeFrom;
+    }
+
+    public void setTimeFrom(LocalTime timeFrom) {
+        this.timeFrom = timeFrom;
+    }
+
+    public LocalTime getTimeTo() {
+        return timeTo;
+    }
+
+    public void setTimeTo(LocalTime timeTo) {
+        this.timeTo = timeTo;
     }
 
     public String getAdditionalDetails() {

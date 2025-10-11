@@ -59,7 +59,8 @@ public class ReviewController {
         
         **Image Upload Features:**
         - Optional: Upload up to 2 images with your review
-        - Supported formats: JPEG, PNG, GIF, WebP (max 10MB each)
+        - Supported formats: JPEG, PNG, GIF, WebP (max 25MB each)
+        - **Automatic Image Compression:** Images are automatically compressed to 500-1000KB for optimal performance
         - Images stored securely on Cloudflare CDN
         - If image upload fails, entire review creation is rolled back
         
